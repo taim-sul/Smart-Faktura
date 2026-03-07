@@ -1,0 +1,888 @@
+<!DOCTYPE html>
+<html lang="da">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black">
+<meta name="apple-mobile-web-app-title" content="Smart Faktura">
+<meta name="theme-color" content="#1a1d2e">
+<title>Smart Faktura System</title>
+<script>
+(function(){
+  const m={name:"Smart Faktura System",short_name:"Faktura",display:"standalone",
+    orientation:"portrait-primary",
+    background_color:"#1a1d2e",theme_color:"#1a1d2e",lang:"da",start_url:location.href,
+    description:"Opret og del professionelle fakturaer direkte fra browseren",
+    categories:["business","finance","productivity"],
+    screenshots:[],
+    icons:[
+      {src:"data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512'%3E%3Crect width='512' height='512' rx='80' fill='%231a1d2e'/%3E%3Crect x='100' y='80' width='312' height='380' rx='14' fill='%23fff'/%3E%3Crect x='140' y='140' width='232' height='16' rx='4' fill='%234f7fff'/%3E%3Crect x='100' y='220' width='312' height='2' fill='%23ddd'/%3E%3Crect x='280' y='300' width='132' height='16' rx='4' fill='%234f7fff'/%3E%3C/svg%3E",sizes:"512x512",type:"image/svg+xml",purpose:"any maskable"},
+      {src:"data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 192 192'%3E%3Crect width='192' height='192' rx='32' fill='%231a1d2e'/%3E%3Crect x='38' y='30' width='116' height='144' rx='8' fill='%23fff'/%3E%3Crect x='54' y='54' width='84' height='12' rx='3' fill='%234f7fff'/%3E%3Crect x='38' y='108' width='116' height='2' fill='%23ddd'/%3E%3Crect x='90' y='130' width='64' height='10' rx='3' fill='%234f7fff'/%3E%3C/svg%3E",sizes:"192x192",type:"image/svg+xml",purpose:"any maskable"}
+    ]};
+  const b=new Blob([JSON.stringify(m)],{type:'application/json'});
+  const l=document.createElement('link');l.rel='manifest';l.href=URL.createObjectURL(b);
+  document.currentScript.parentNode.appendChild(l);
+})();
+</script>
+<link rel="apple-touch-icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 180 180'%3E%3Crect width='180' height='180' rx='40' fill='%231a1d2e'/%3E%3Crect x='36' y='28' width='108' height='136' rx='8' fill='%23fff'/%3E%3Crect x='52' y='52' width='76' height='12' rx='3' fill='%234f7fff'/%3E%3Crect x='36' y='104' width='108' height='2' fill='%23ddd'/%3E%3Crect x='96' y='130' width='48' height='10' rx='3' fill='%234f7fff'/%3E%3C/svg%3E">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#f4f6fb;
+  --card:#ffffff;
+  --ink:#1a1d2e;
+  --muted:#6b7280;
+  --border:#e2e6f0;
+  --accent:#4f7fff;
+  --accent-dark:#3a68f0;
+  --accent-bg:#eef3ff;
+  --red:#e05252;
+  --red-bg:#fff0f0;
+  --green:#22a06b;
+  --green-bg:#edfaf3;
+  --sans:'Inter',system-ui,sans-serif;
+  --safe-top:env(safe-area-inset-top,0px);
+  --safe-bottom:env(safe-area-inset-bottom,0px);
+  --radius:12px;
+}
+html,body{height:100%}
+body{font-family:var(--sans);background:var(--bg);color:var(--ink);
+  min-height:100dvh;display:flex;flex-direction:column;
+  -webkit-font-smoothing:antialiased}
+
+/* TOP BAR */
+.topbar{background:var(--ink);color:#fff;padding:0 1.5rem;padding-top:var(--safe-top);
+  height:calc(56px + var(--safe-top));display:flex;align-items:flex-end;
+  position:sticky;top:0;z-index:200;flex-shrink:0}
+.topbar-inner{display:flex;align-items:center;justify-content:space-between;width:100%;height:56px}
+.tb-left{display:flex;align-items:center;gap:.75rem}
+.tb-logo{width:32px;height:32px;background:var(--accent);border-radius:8px;
+  display:flex;align-items:center;justify-content:center;
+  font-size:.7rem;font-weight:800;color:#fff;flex-shrink:0}
+.tb-title{font-size:.9rem;font-weight:700;color:#fff}
+.tb-actions{display:flex;gap:.5rem}
+.tb-btn{font-family:var(--sans);font-size:.78rem;font-weight:600;
+  padding:.4rem .9rem;border:none;border-radius:6px;cursor:pointer;transition:all .15s}
+.tb-btn-ghost{background:rgba(255,255,255,.1);color:rgba(255,255,255,.85)}
+.tb-btn-ghost:hover{background:rgba(255,255,255,.18)}
+.tb-btn-primary{background:var(--accent);color:#fff}
+.tb-btn-primary:hover{background:var(--accent-dark)}
+
+/* PROGRESS */
+.progress-bar{background:#fff;border-bottom:1px solid var(--border);
+  padding:.75rem 1.5rem;display:flex;align-items:center;gap:.4rem;
+  overflow-x:auto;scrollbar-width:none;flex-shrink:0}
+.progress-bar::-webkit-scrollbar{display:none}
+.step-pill{display:flex;align-items:center;gap:.35rem;font-size:.78rem;font-weight:500;
+  color:var(--muted);white-space:nowrap;flex-shrink:0;
+  padding:.3rem .65rem;border-radius:20px;transition:all .2s}
+.step-pill.active{background:var(--accent-bg);color:var(--accent);font-weight:700}
+.step-pill.done{color:var(--green)}
+.step-dot{width:20px;height:20px;border-radius:50%;display:flex;align-items:center;
+  justify-content:center;font-size:.65rem;font-weight:700;flex-shrink:0;
+  background:var(--border);color:var(--muted);transition:all .2s}
+.step-pill.active .step-dot{background:var(--accent);color:#fff}
+.step-pill.done .step-dot{background:var(--green);color:#fff}
+.step-arrow{color:#d1d5db;font-size:.75rem;flex-shrink:0}
+
+/* MAIN */
+.main{flex:1;overflow-y:auto;padding:2rem 1rem calc(2rem + var(--safe-bottom));
+  display:flex;flex-direction:column;align-items:center}
+
+/* WIZARD CARD */
+.wizard-card{background:var(--card);border-radius:var(--radius);
+  border:1px solid var(--border);
+  box-shadow:0 2px 16px rgba(0,0,0,.07);
+  width:100%;max-width:580px;padding:2rem;
+  display:none;flex-direction:column;gap:1.6rem;
+  animation:fadeIn .2s ease}
+.wizard-card.active{display:flex}
+@keyframes fadeIn{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
+.card-heading{font-size:1.3rem;font-weight:700;color:var(--ink)}
+.card-sub{font-size:.9rem;color:var(--muted);margin-top:.25rem;line-height:1.5}
+
+/* FIELDS */
+.fields{display:flex;flex-direction:column;gap:1.2rem}
+.field{display:flex;flex-direction:column;gap:.5rem}
+.field label{font-size:.9rem;font-weight:600;color:var(--ink)}
+.field input,.field select{font-family:var(--sans);font-size:1rem;
+  padding:.75rem 1rem;border:2px solid var(--border);border-radius:8px;
+  background:#fff;color:var(--ink);outline:none;width:100%;
+  transition:border-color .15s,box-shadow .15s;-webkit-appearance:none}
+.field input:focus,.field select:focus{border-color:var(--accent);
+  box-shadow:0 0 0 3px rgba(79,127,255,.15)}
+.field input::placeholder{color:#c0c8d8}
+.field-row{display:grid;grid-template-columns:1fr 1fr;gap:.8rem}
+@media(max-width:480px){.field-row{grid-template-columns:1fr}}
+
+/* CVR */
+.cvr-wrap{display:flex;gap:.5rem;align-items:flex-end}
+.cvr-wrap input{flex:1}
+.cvr-btn{font-family:var(--sans);font-size:.9rem;font-weight:600;
+  padding:.75rem 1rem;border:2px solid var(--accent);
+  background:var(--accent-bg);color:var(--accent);
+  border-radius:8px;cursor:pointer;white-space:nowrap;
+  transition:all .15s;display:flex;align-items:center;gap:.3rem;flex-shrink:0}
+.cvr-btn:hover{background:var(--accent);color:#fff}
+.cvr-btn:disabled{opacity:.4;cursor:not-allowed}
+.cvr-msg{font-size:.83rem;padding:.5rem .85rem;border-radius:7px;display:none;margin-top:.25rem}
+.cvr-msg.ok     {display:block;background:var(--green-bg);color:var(--green)}
+.cvr-msg.error  {display:block;background:var(--red-bg);color:var(--red)}
+.cvr-msg.loading{display:block;background:var(--accent-bg);color:var(--accent)}
+
+/* DOC TYPE */
+.type-toggle{display:grid;grid-template-columns:1fr 1fr;gap:.8rem}
+.type-opt{border:2px solid var(--border);border-radius:10px;padding:1.2rem 1rem;
+  cursor:pointer;transition:all .18s;display:flex;flex-direction:column;
+  align-items:center;gap:.5rem;background:#fff}
+.type-opt:hover{border-color:var(--accent);background:var(--accent-bg)}
+.type-opt.selected{border-color:var(--accent);background:var(--accent-bg)}
+.type-opt.selected-red{border-color:var(--red);background:var(--red-bg)}
+.type-icon{font-size:2rem;line-height:1}
+.type-label{font-size:.95rem;font-weight:700;color:var(--ink)}
+.type-desc{font-size:.78rem;color:var(--muted);text-align:center;line-height:1.4}
+
+/* LINE ITEMS */
+.line-list{display:flex;flex-direction:column;gap:.9rem}
+.line-card{background:var(--bg);border:2px solid var(--border);border-radius:10px;
+  padding:1.1rem;display:flex;flex-direction:column;gap:.9rem;position:relative}
+.line-del{position:absolute;top:.65rem;right:.65rem;background:none;border:none;
+  color:var(--muted);font-size:.95rem;cursor:pointer;width:28px;height:28px;
+  border-radius:6px;display:flex;align-items:center;justify-content:center}
+.line-del:hover{background:var(--red-bg);color:var(--red)}
+.vat-toggle{display:grid;grid-template-columns:1fr 1fr;gap:.5rem}
+.vat-opt{border:2px solid var(--border);border-radius:7px;padding:.6rem;
+  cursor:pointer;text-align:center;font-size:.85rem;font-weight:600;
+  color:var(--muted);background:#fff;transition:all .15s}
+.vat-opt:hover{border-color:var(--accent)}
+.vat-opt.on-vat{border-color:var(--accent);background:var(--accent-bg);color:var(--accent)}
+.vat-opt.on-exempt{border-color:#f59e0b;background:#fffbeb;color:#92610a}
+.add-line-btn{border:2px dashed var(--border);border-radius:10px;padding:.9rem;
+  background:none;cursor:pointer;font-family:var(--sans);font-size:.92rem;
+  font-weight:600;color:var(--accent);transition:all .15s;width:100%}
+.add-line-btn:hover{border-color:var(--accent);background:var(--accent-bg)}
+
+/* NAV BUTTONS */
+.nav-btns{display:flex;gap:.75rem;justify-content:space-between;padding-top:.5rem}
+.btn-back{font-family:var(--sans);font-size:.92rem;font-weight:600;
+  padding:.75rem 1.4rem;border:2px solid var(--border);border-radius:8px;
+  background:#fff;color:var(--muted);cursor:pointer;transition:all .15s}
+.btn-back:hover{border-color:var(--ink);color:var(--ink)}
+.btn-next{font-family:var(--sans);font-size:.92rem;font-weight:700;
+  padding:.75rem 1.8rem;border:none;border-radius:8px;
+  background:var(--accent);color:#fff;cursor:pointer;
+  transition:all .15s;margin-left:auto;display:flex;align-items:center;gap:.4rem}
+.btn-next:hover{background:var(--accent-dark)}
+.btn-preview{font-family:var(--sans);font-size:.92rem;font-weight:700;
+  padding:.75rem 1.8rem;border:none;border-radius:8px;
+  background:var(--green);color:#fff;cursor:pointer;
+  transition:all .15s;margin-left:auto;display:flex;align-items:center;gap:.4rem}
+.btn-preview:hover{background:#1a8a58}
+
+/* PREVIEW */
+.preview-card{background:var(--card);border-radius:var(--radius);
+  border:1px solid var(--border);box-shadow:0 2px 16px rgba(0,0,0,.07);
+  width:100%;max-width:760px;display:none;flex-direction:column;
+  animation:fadeIn .2s ease}
+.preview-card.active{display:flex}
+.preview-toolbar{padding:1rem 1.5rem;border-bottom:1px solid var(--border);
+  display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:.6rem}
+.preview-toolbar-left{display:flex;align-items:center;gap:.7rem}
+.prev-title{font-size:.9rem;font-weight:700;color:var(--ink)}
+.prev-back-btn{font-family:var(--sans);font-size:.82rem;font-weight:600;
+  padding:.45rem .9rem;border:2px solid var(--border);border-radius:6px;
+  background:#fff;color:var(--muted);cursor:pointer;transition:all .15s}
+.prev-back-btn:hover{border-color:var(--ink);color:var(--ink)}
+.preview-actions{display:flex;gap:.5rem}
+.prev-btn{font-family:var(--sans);font-size:.82rem;font-weight:600;
+  padding:.45rem .9rem;border:none;border-radius:6px;cursor:pointer;transition:all .15s}
+.prev-print{background:#f3f4f6;color:var(--ink)}.prev-print:hover{background:#e5e7eb}
+.prev-dl{background:var(--accent);color:#fff}.prev-dl:hover{background:var(--accent-dark)}
+.preview-doc-wrap{padding:1.5rem;overflow-x:auto}
+
+/* INVOICE */
+.invoice{background:#fff;width:100%;max-width:680px;margin:0 auto;
+  min-height:960px;padding:48px 48px 56px;
+  box-shadow:0 0 0 1px #e0e0e0,0 4px 24px rgba(0,0,0,.1);
+  font-family:'Inter',Helvetica,Arial,sans-serif;
+  font-size:11px;line-height:1.45;color:#1a1d2e;position:relative}
+@media(max-width:560px){.invoice{padding:24px 18px 36px;min-height:auto}}
+.inv-top{text-align:center;font-size:13px;font-weight:700;margin-bottom:28px}
+.inv-addrs{display:flex;justify-content:space-between;margin-bottom:32px}
+.inv-addr{font-size:10.5px;line-height:1.75}
+.inv-addr-right{text-align:right}
+.inv-addr-name{font-weight:700}
+.inv-head{display:flex;align-items:baseline;border-bottom:1.5px solid #dde;padding-bottom:8px}
+.inv-word{font-size:30px;font-weight:300;line-height:1;margin-right:20px;flex-shrink:0}
+.inv-meta{display:flex;align-items:baseline;flex:1;font-size:9.5px;flex-wrap:wrap;gap:2px 0}
+.inv-mg{display:flex;align-items:baseline;gap:3px;margin-right:14px}
+.inv-mg:last-child{margin-left:auto;margin-right:0}
+.inv-ml{color:#888}.inv-mv{font-weight:700}
+.inv-credit-ref{font-size:9.5px;color:#c0533a;margin-top:3px;font-weight:600}
+.inv-tbl{width:100%;border-collapse:collapse}
+.inv-tbl thead tr{border-bottom:1.5px solid #dde}
+.inv-tbl thead th{font-size:10px;font-weight:700;padding:6px 0;text-align:left;white-space:nowrap}
+.inv-tbl thead th.r{text-align:right}
+.inv-tbl tbody td{padding:7px 0;font-size:10.5px;vertical-align:top}
+.inv-tbl tbody td.r{text-align:right}
+.inv-tbl .irow td{font-weight:600}
+.inv-neg{color:#c0533a;text-align:right}
+.inv-pay-note{margin-top:26px;font-size:10.5px}
+.inv-pay-head{font-size:19px;font-weight:400;margin-top:12px;margin-bottom:5px}
+.inv-pay-det{font-size:10.5px}
+.inv-foot{position:absolute;bottom:18px;right:48px;font-size:8.5px;color:#bbb}
+
+/* TOAST */
+#toast{position:fixed;bottom:calc(1.2rem + var(--safe-bottom));left:50%;
+  transform:translateX(-50%) translateY(70px);background:var(--ink);color:#fff;
+  padding:.55rem 1.2rem;border-radius:20px;font-size:.8rem;font-weight:500;z-index:9999;
+  transition:transform .3s;white-space:nowrap;box-shadow:0 4px 20px rgba(0,0,0,.3);pointer-events:none}
+#toast.show{transform:translateX(-50%) translateY(0)}
+
+/* iOS hint */
+#iosHint{display:none;background:var(--accent);color:#fff;padding:.8rem 1.2rem;
+  font-size:.82rem;line-height:1.5;align-items:center;gap:.8rem}
+#iosHint.show{display:flex}
+#iosHint button{background:rgba(255,255,255,.2);border:none;color:#fff;
+  font-size:1rem;cursor:pointer;padding:.2rem .5rem;border-radius:4px;flex-shrink:0}
+
+/* SHARE BUTTONS */
+.prev-share-email{background:#f0f4ff;color:#4f7fff;border:1.5px solid #c7d8ff}
+.prev-share-email:hover{background:#4f7fff;color:#fff}
+.prev-share-wa{background:#e8faf2;color:#22a06b;border:1.5px solid #a8e6cc}
+.prev-share-wa:hover{background:#22a06b;color:#fff}
+.prev-btn{border:none}
+.prev-share-email,.prev-share-wa{border-width:1.5px;border-style:solid}
+
+/* PWA INSTALL BANNER */
+#pwaInstallBanner{display:none;background:linear-gradient(135deg,#1a1d2e 0%,#2d3250 100%);
+  color:#fff;padding:.9rem 1.5rem;align-items:center;gap:.8rem;flex-shrink:0}
+#pwaInstallBanner.show{display:flex}
+#pwaInstallBanner .pwa-icon{font-size:1.6rem;flex-shrink:0}
+#pwaInstallBanner .pwa-text{flex:1;font-size:.83rem;line-height:1.45}
+#pwaInstallBanner .pwa-text strong{display:block;font-size:.9rem;margin-bottom:.15rem}
+#pwaInstallBanner .pwa-install-btn{font-family:var(--sans);font-size:.82rem;font-weight:700;
+  padding:.5rem 1rem;background:var(--accent);color:#fff;border:none;border-radius:6px;
+  cursor:pointer;white-space:nowrap;transition:all .15s;flex-shrink:0}
+#pwaInstallBanner .pwa-install-btn:hover{background:var(--accent-dark)}
+#pwaInstallBanner .pwa-dismiss{background:rgba(255,255,255,.12);border:none;color:rgba(255,255,255,.7);
+  font-size:1rem;cursor:pointer;padding:.2rem .5rem;border-radius:4px;flex-shrink:0}
+
+/* SHARE MODAL */
+#shareModal{display:none;position:fixed;inset:0;z-index:500;align-items:center;justify-content:center}
+#shareModal.open{display:flex}
+.share-backdrop{position:absolute;inset:0;background:rgba(0,0,0,.45);backdrop-filter:blur(4px)}
+.share-box{position:relative;background:#fff;border-radius:16px;padding:2rem;
+  width:90%;max-width:400px;box-shadow:0 20px 60px rgba(0,0,0,.25);
+  animation:fadeIn .2s ease;display:flex;flex-direction:column;gap:1.2rem}
+.share-title{font-size:1.1rem;font-weight:700;color:var(--ink)}
+.share-sub{font-size:.85rem;color:var(--muted);line-height:1.5;margin-top:.2rem}
+.share-options{display:flex;flex-direction:column;gap:.75rem}
+.share-opt{display:flex;align-items:center;gap:.9rem;padding:.9rem 1rem;
+  border:2px solid var(--border);border-radius:10px;cursor:pointer;
+  transition:all .15s;text-decoration:none;background:#fff;font-family:var(--sans);width:100%}
+.share-opt:hover{border-color:var(--accent);background:var(--accent-bg)}
+.share-opt-wa:hover{border-color:#22a06b;background:#edfaf3}
+.share-opt-icon{font-size:1.5rem;width:36px;text-align:center;flex-shrink:0}
+.share-opt-text{text-align:left}
+.share-opt-label{font-size:.92rem;font-weight:700;color:var(--ink);display:block}
+.share-opt-hint{font-size:.78rem;color:var(--muted)}
+.share-close{background:none;border:none;font-size:1.2rem;cursor:pointer;color:var(--muted);
+  position:absolute;top:1rem;right:1rem;width:32px;height:32px;border-radius:6px;
+  display:flex;align-items:center;justify-content:center}
+.share-close:hover{background:var(--border)}
+.share-divider{display:flex;align-items:center;gap:.5rem;color:var(--muted);font-size:.78rem}
+.share-divider::before,.share-divider::after{content:'';flex:1;height:1px;background:var(--border)}
+
+/* PRINT */
+@media print{
+  #toast,#iosHint,.topbar,.progress-bar,.preview-toolbar{display:none!important}
+  .main{padding:0;overflow:visible}
+  .preview-card{box-shadow:none;border:none}
+  .preview-doc-wrap{padding:0}
+  .invoice{box-shadow:none;min-height:auto;padding:10mm 14mm}
+}
+</style>
+</head>
+<body>
+
+<!-- PWA INSTALL BANNER -->
+<div id="pwaInstallBanner">
+  <div class="pwa-icon">📲</div>
+  <div class="pwa-text">
+    <strong>Installer Smart Faktura</strong>
+    Brug appen offline — ingen browser nødvendig
+  </div>
+  <button class="pwa-install-btn" onclick="triggerInstall()">Installer</button>
+  <button class="pwa-dismiss" onclick="dismissPWA()">✕</button>
+</div>
+
+<!-- SHARE MODAL -->
+<div id="shareModal">
+  <div class="share-backdrop" onclick="closeShare()"></div>
+  <div class="share-box">
+    <button class="share-close" onclick="closeShare()">✕</button>
+    <div>
+      <div class="share-title">📤 Del faktura</div>
+      <div class="share-sub">Vælg hvordan du vil sende fakturaen</div>
+    </div>
+    <div class="share-options">
+      <button class="share-opt" onclick="shareEmail()">
+        <div class="share-opt-icon">✉️</div>
+        <div class="share-opt-text">
+          <span class="share-opt-label">Send via e-mail</span>
+          <span class="share-opt-hint">Åbner din mail-app med fakturaoversigt</span>
+        </div>
+      </button>
+      <button class="share-opt share-opt-wa" onclick="shareWhatsApp()">
+        <div class="share-opt-icon">💬</div>
+        <div class="share-opt-text">
+          <span class="share-opt-label">Send via WhatsApp</span>
+          <span class="share-opt-hint">Del fakturaoversigt som besked</span>
+        </div>
+      </button>
+      <div class="share-divider">eller</div>
+      <button class="share-opt" onclick="downloadHTML();closeShare()">
+        <div class="share-opt-icon">⬇️</div>
+        <div class="share-opt-text">
+          <span class="share-opt-label">Download HTML-fil</span>
+          <span class="share-opt-hint">Gem fakturaen lokalt og vedhæft manuelt</span>
+        </div>
+      </button>
+    </div>
+  </div>
+</div>
+
+<div id="iosHint">
+  <div style="flex:1"><strong>📲 Installer på iPhone:</strong> Tryk Del (□↑) i Safari → "Føj til hjemmeskærm" for at bruge appen offline</div>
+  <button onclick="this.parentElement.classList.remove('show')">✕</button>
+</div>
+<div id="toast">📴 Offline — appen virker stadig</div>
+
+<!-- TOP BAR -->
+<div class="topbar">
+  <div class="topbar-inner">
+    <div class="tb-left">
+      <div class="tb-logo">SF</div>
+      <span class="tb-title">Smart Faktura System</span>
+    </div>
+    <div class="tb-actions">
+      <button class="tb-btn tb-btn-ghost" onclick="window.print()">🖨 Udskriv</button>
+      <button class="tb-btn tb-btn-primary" onclick="downloadHTML()">↓ Download</button>
+    </div>
+  </div>
+</div>
+
+<!-- PROGRESS -->
+<div class="progress-bar">
+  <div class="step-pill active" id="pill-0"><div class="step-dot">1</div>Type</div>
+  <div class="step-arrow">›</div>
+  <div class="step-pill" id="pill-1"><div class="step-dot">2</div>Modtager</div>
+  <div class="step-arrow">›</div>
+  <div class="step-pill" id="pill-2"><div class="step-dot">3</div>Afsender</div>
+  <div class="step-arrow">›</div>
+  <div class="step-pill" id="pill-3"><div class="step-dot">4</div>Detaljer</div>
+  <div class="step-arrow">›</div>
+  <div class="step-pill" id="pill-4"><div class="step-dot">5</div>Linjer</div>
+  <div class="step-arrow">›</div>
+  <div class="step-pill" id="pill-5"><div class="step-dot">6</div>Betaling</div>
+  <div class="step-arrow">›</div>
+  <div class="step-pill" id="pill-6"><div class="step-dot">✓</div>Vis faktura</div>
+</div>
+
+<!-- MAIN CONTENT -->
+<div class="main">
+
+  <!-- STEP 0 -->
+  <div class="wizard-card active" id="step-0">
+    <div>
+      <div class="card-heading">Hvad vil du oprette?</div>
+      <div class="card-sub">Vælg dokumenttype for at komme i gang</div>
+    </div>
+    <div class="type-toggle">
+      <div class="type-opt selected" id="opt-faktura" onclick="selectType('faktura')">
+        <div class="type-icon">📄</div>
+        <div class="type-label">Faktura</div>
+        <div class="type-desc">Send en faktura til en kunde</div>
+      </div>
+      <div class="type-opt" id="opt-kredit" onclick="selectType('kredit')">
+        <div class="type-icon">↩️</div>
+        <div class="type-label">Kreditnota</div>
+        <div class="type-desc">Kreditér en eksisterende faktura</div>
+      </div>
+    </div>
+    <div class="field" id="creditRefWrap" style="display:none">
+      <label>Krediteres fakturanr.</label>
+      <input type="text" id="creditRef" placeholder="F.eks. 2025-001">
+    </div>
+    <div class="nav-btns">
+      <button class="btn-next" onclick="goTo(1)">Næste — Afsender →</button>
+    </div>
+  </div>
+
+  <!-- STEP 1 -->
+  <div class="wizard-card" id="step-1">
+    <div>
+      <div class="card-heading">Afsender</div>
+      <div class="card-sub">Oplysninger om dit firma</div>
+    </div>
+    <div class="fields">
+      <div class="field">
+        <label>CVR-nr. — hent oplysninger automatisk</label>
+        <div class="cvr-wrap">
+          <input type="text" id="senderCVR" placeholder="12345678" maxlength="8" inputmode="numeric">
+          <button class="cvr-btn" id="senderCVRBtn" onclick="fetchCVR('sender')">🔍 Hent</button>
+        </div>
+        <div class="cvr-msg" id="senderCVRMsg"></div>
+      </div>
+      <div class="field"><label>Firmanavn</label><input type="text" id="senderName" placeholder="Dit firma ApS" oninput="syncTopTitle()"></div>
+      <div class="field"><label>Adresse</label><input type="text" id="senderAddress" placeholder="Vejnavn 1"></div>
+      <div class="field-row">
+        <div class="field"><label>Postnummer</label><input type="text" id="senderZip" placeholder="1234" inputmode="numeric"></div>
+        <div class="field"><label>By</label><input type="text" id="senderCity2" placeholder="København"></div>
+      </div>
+    </div>
+    <div class="nav-btns">
+      <button class="btn-back" onclick="goTo(0)">← Tilbage</button>
+      <button class="btn-next" onclick="goTo(2)">Næste — Modtager →</button>
+    </div>
+  </div>
+
+  <!-- STEP 2 -->
+  <div class="wizard-card" id="step-2">
+    <div>
+      <div class="card-heading">Modtager</div>
+      <div class="card-sub">Hvem modtager fakturaen?</div>
+    </div>
+    <div class="fields">
+      <div class="field">
+        <label>CVR-nr. — hent oplysninger automatisk</label>
+        <div class="cvr-wrap">
+          <input type="text" id="recvCVR" placeholder="12345678" maxlength="8" inputmode="numeric">
+          <button class="cvr-btn" id="recvCVRBtn" onclick="fetchCVR('recv')">🔍 Hent</button>
+        </div>
+        <div class="cvr-msg" id="recvCVRMsg"></div>
+      </div>
+      <div class="field"><label>Navn / Firma</label><input type="text" id="recvName" placeholder="Kundens navn"></div>
+      <div class="field"><label>Adresse</label><input type="text" id="recvAddress" placeholder="Vejnavn 1"></div>
+      <div class="field-row">
+        <div class="field"><label>Postnummer</label><input type="text" id="recvZip" placeholder="1234" inputmode="numeric"></div>
+        <div class="field"><label>By</label><input type="text" id="recvCity2" placeholder="København"></div>
+      </div>
+      <div class="field"><label>Email</label><input type="email" id="recvEmail" placeholder="kunde@firma.dk"></div>
+    </div>
+    <div class="nav-btns">
+      <button class="btn-back" onclick="goTo(1)">← Tilbage</button>
+      <button class="btn-next" onclick="goTo(3)">Næste — Detaljer →</button>
+    </div>
+  </div>
+
+  <!-- STEP 3 -->
+  <div class="wizard-card" id="step-3">
+    <div>
+      <div class="card-heading">Fakturadetaljer</div>
+      <div class="card-sub">Nummer, datoer og moms</div>
+    </div>
+    <div class="fields">
+      <div class="field"><label>Overskrift øverst på fakturaen</label><input type="text" id="topTitle" placeholder="Udfyldes automatisk fra afsender" oninput="this.dataset.manual=this.value?'1':''"></div>
+      <div class="field">
+        <label>Fakturanr. <span style="font-weight:400;color:var(--muted)">(valgfri)</span></label>
+        <input type="text" id="invoiceNr" placeholder="F.eks. 2025-001">
+      </div>
+      <div class="field-row">
+        <div class="field"><label>Fakturadato</label><input type="text" id="invoiceDate" placeholder="31. dec. 2025"></div>
+        <div class="field" id="dueDateField"><label>Betalingsfrist</label><input type="text" id="dueDate" placeholder="7. jan. 2026"></div>
+      </div>
+      <div class="field"><label>Momsprocent (%)</label><input type="number" id="vatRate" value="25" min="0" max="100" inputmode="numeric"></div>
+    </div>
+    <div class="nav-btns">
+      <button class="btn-back" onclick="goTo(2)">← Tilbage</button>
+      <button class="btn-next" onclick="goTo(4)">Næste — Fakturaliner →</button>
+    </div>
+  </div>
+
+  <!-- STEP 4 -->
+  <div class="wizard-card" id="step-4">
+    <div>
+      <div class="card-heading">Fakturaliner</div>
+      <div class="card-sub">Tilføj produkter eller ydelser der skal faktureres</div>
+    </div>
+    <div class="line-list" id="lineList"></div>
+    <button class="add-line-btn" onclick="addLine()">+ Tilføj linje</button>
+    <div class="nav-btns">
+      <button class="btn-back" onclick="goTo(3)">← Tilbage</button>
+      <button class="btn-next" id="nextFromLines" onclick="goNext4()">Næste — Betaling →</button>
+    </div>
+  </div>
+
+  <!-- STEP 5 -->
+  <div class="wizard-card" id="step-5">
+    <div>
+      <div class="card-heading">Betalingsinformation</div>
+      <div class="card-sub">Bankoplysninger der vises på fakturaen</div>
+    </div>
+    <div class="fields">
+      <div class="field"><label>Betalingsnote</label><input type="text" id="payNote" placeholder="Beløbet bedes indbetalt senest..."></div>
+      <div class="field"><label>Bankoplysninger</label><input type="text" id="bankInfo" placeholder="Reg.nr.: 0000. Kontonr.: 0000000000."></div>
+    </div>
+    <div class="nav-btns">
+      <button class="btn-back" onclick="goTo(4)">← Tilbage</button>
+      <button class="btn-preview" onclick="showPreview()">👁 Vis faktura</button>
+    </div>
+  </div>
+
+  <!-- PREVIEW -->
+  <div class="preview-card" id="step-preview">
+    <div class="preview-toolbar">
+      <div class="preview-toolbar-left">
+        <button class="prev-back-btn" onclick="goBack()">← Rediger</button>
+        <span class="prev-title" id="prevTitle">Faktura klar ✓</span>
+      </div>
+      <div class="preview-actions">
+        <button class="prev-btn prev-print" onclick="window.print()">🖨 Udskriv</button>
+        <button class="prev-btn prev-share-email" onclick="openShare()">📤 Del</button>
+        <button class="prev-btn prev-dl" onclick="downloadHTML()">↓ Download</button>
+      </div>
+    </div>
+    <div class="preview-doc-wrap">
+      <div class="invoice" id="invoice"></div>
+    </div>
+  </div>
+
+</div>
+
+<script>
+// ── PWA INSTALL PROMPT ──
+let deferredPrompt = null;
+window.addEventListener('beforeinstallprompt', e => {
+  e.preventDefault();
+  deferredPrompt = e;
+  if (!sessionStorage.pwaDismissed) {
+    document.getElementById('pwaInstallBanner').classList.add('show');
+  }
+});
+window.addEventListener('appinstalled', () => {
+  document.getElementById('pwaInstallBanner').classList.remove('show');
+  deferredPrompt = null;
+});
+function triggerInstall() {
+  if (deferredPrompt) {
+    deferredPrompt.prompt();
+    deferredPrompt.userChoice.then(() => {
+      deferredPrompt = null;
+      document.getElementById('pwaInstallBanner').classList.remove('show');
+    });
+  }
+}
+function dismissPWA() {
+  document.getElementById('pwaInstallBanner').classList.remove('show');
+  sessionStorage.pwaDismissed = '1';
+}
+
+// ── SHARE ──
+function openShare() { document.getElementById('shareModal').classList.add('open'); }
+function closeShare() { document.getElementById('shareModal').classList.remove('open'); }
+
+function buildInvoiceText() {
+  const isK = docType === 'kredit';
+  const vRate = parseFloat(gv('vatRate')) / 100 || 0;
+  const sub = lines.reduce((s, l) => s + l.qty * l.price, 0);
+  const mp = lines.reduce((s, l) => l.vatType !== 'exempt' ? s + l.qty * l.price : s, 0);
+  const vat = mp * vRate, tot = sub + vat;
+  const sign = isK ? -1 : 1;
+  const label = isK ? 'Kreditnota' : 'Faktura';
+  const nr = gv('invoiceNr') ? ` nr. ${gv('invoiceNr')}` : '';
+  const date = gv('invoiceDate') ? `\nDato: ${gv('invoiceDate')}` : '';
+  const due = !isK && gv('dueDate') ? `\nBetalingsfrist: ${gv('dueDate')}` : '';
+  const from = gv('senderName') ? `\nFra: ${gv('senderName')}` : '';
+  const to = gv('recvName') ? `\nTil: ${gv('recvName')}` : '';
+
+  const lineRows = lines.map(l =>
+    `  • ${l.desc || 'Ydelse'}: ${l.qty} × ${fmt(l.price)} = ${fmt(sign * l.qty * l.price)}`
+  ).join('\n');
+
+  const bank = gv('bankInfo') ? `\n\nBetaling:\n${gv('bankInfo')}` : '';
+  const note = gv('payNote') ? `\n${gv('payNote')}` : '';
+
+  return `${label}${nr}${from}${to}${date}${due}
+
+Linjer:
+${lineRows}
+
+Ekskl. moms: ${fmt(sign * sub)}
+Moms (${Math.round(parseFloat(gv('vatRate')) || 0)}%): ${fmt(sign * vat)}
+I alt inkl. moms: ${fmt(sign * tot)}${bank}${note}`;
+}
+
+function shareEmail() {
+  const isK = docType === 'kredit';
+  const label = isK ? 'Kreditnota' : 'Faktura';
+  const nr = gv('invoiceNr') ? ` nr. ${gv('invoiceNr')}` : '';
+  const to = gv('recvEmail') || '';
+  const subject = encodeURIComponent(`${label}${nr} fra ${gv('senderName') || 'os'}`);
+  const body = encodeURIComponent(buildInvoiceText() + '\n\n(Fakturaen er vedhæftet som HTML-fil)');
+  window.location.href = `mailto:${to}?subject=${subject}&body=${body}`;
+  closeShare();
+}
+
+function shareWhatsApp() {
+  const text = encodeURIComponent(buildInvoiceText());
+  const isMobile = /iphone|android|ipad/i.test(navigator.userAgent);
+  const url = isMobile
+    ? `whatsapp://send?text=${text}`
+    : `https://web.whatsapp.com/send?text=${text}`;
+  window.open(url, '_blank');
+  closeShare();
+}
+
+// ── SERVICE WORKER (blob, no server needed) ──
+if('serviceWorker' in navigator){
+  const sw=`const C='sfs-v3';
+self.addEventListener('install',e=>e.waitUntil(caches.open(C).then(c=>c.add(self.location.href)).then(()=>self.skipWaiting())));
+self.addEventListener('activate',e=>e.waitUntil(caches.keys().then(ks=>Promise.all(ks.filter(k=>k!==C).map(k=>caches.delete(k)))).then(()=>self.clients.claim())));
+self.addEventListener('fetch',e=>{
+  const u=new URL(e.request.url);
+  if(u.hostname==='cvrapi.dk'){e.respondWith(fetch(e.request).catch(()=>new Response(JSON.stringify({error:'offline'}),{headers:{'Content-Type':'application/json'}})));return;}
+  if(u.hostname.includes('fonts.g')){e.respondWith(fetch(e.request).then(r=>{const c=r.clone();caches.open(C).then(cc=>cc.put(e.request,c));return r;}).catch(()=>caches.match(e.request)));return;}
+  e.respondWith(caches.match(e.request).then(h=>h||fetch(e.request)));
+});`;
+  navigator.serviceWorker.register(URL.createObjectURL(new Blob([sw],{type:'application/javascript'})),{scope:'./'}).catch(()=>{});
+}
+
+// iOS hint
+if(/iphone|ipad|ipod/i.test(navigator.userAgent)&&!navigator.standalone&&!sessionStorage.ih){
+  document.getElementById('iosHint').classList.add('show');sessionStorage.ih=1;
+}
+window.addEventListener('offline',()=>{const t=document.getElementById('toast');t.classList.add('show');setTimeout(()=>t.classList.remove('show'),3500);});
+
+// ── STATE ──
+let docType='faktura', currentStep=0;
+let lines=[{desc:'',qty:1,price:0,vatType:'vat'}];
+
+// ── NAVIGATION ──
+function goTo(n){
+  document.querySelectorAll('.wizard-card').forEach(c=>c.classList.remove('active'));
+  document.getElementById('step-preview').classList.remove('active');
+  document.getElementById('step-'+n).classList.add('active');
+  currentStep=n;
+  updatePills();
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+
+function goBack(){
+  // Go back to step 5 (or 4 for kredit)
+  const back = docType==='kredit' ? 4 : 5;
+  goTo(back);
+}
+
+function updatePills(){
+  for(let i=0;i<7;i++){
+    const p=document.getElementById('pill-'+i);
+    if(!p)continue;
+    p.classList.remove('active','done');
+    if(i===currentStep)p.classList.add('active');
+    else if(i<currentStep)p.classList.add('done');
+  }
+}
+
+function goNext4(){
+  if(docType==='kredit')showPreview();
+  else goTo(5);
+}
+
+function showPreview(){
+  renderInvoice();
+  document.querySelectorAll('.wizard-card').forEach(c=>c.classList.remove('active'));
+  document.getElementById('step-preview').classList.add('active');
+  document.getElementById('prevTitle').textContent=docType==='kredit'?'Kreditnota klar ✓':'Faktura klar ✓';
+  currentStep=6;
+  updatePills();
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+
+// ── DOC TYPE ──
+function selectType(t){
+  docType=t;
+  document.getElementById('opt-faktura').className='type-opt'+(t==='faktura'?' selected':'');
+  document.getElementById('opt-kredit').className='type-opt'+(t==='kredit'?' selected-red':'');
+  document.getElementById('creditRefWrap').style.display=t==='kredit'?'':'none';
+  document.getElementById('dueDateField').style.display=t==='kredit'?'none':'';
+  document.getElementById('nextFromLines').textContent=t==='kredit'?'👁 Vis kreditnota':'Næste — Betaling →';
+}
+
+function syncTopTitle(){
+  const tt=document.getElementById('topTitle');
+  // Only auto-fill if user hasn't manually changed it
+  if(!tt.dataset.manual){
+    tt.value=document.getElementById('senderName').value;
+  }
+}
+
+// ── CVR ──
+async function fetchCVR(side){
+  const isSender=side==='sender';
+  const inp=document.getElementById(isSender?'senderCVR':'recvCVR');
+  const msg=document.getElementById(isSender?'senderCVRMsg':'recvCVRMsg');
+  const btn=document.getElementById(isSender?'senderCVRBtn':'recvCVRBtn');
+  const cvr=inp.value.trim().replace(/\s/g,'');
+  if(!/^\d{8}$/.test(cvr)){msg.className='cvr-msg error';msg.textContent='⚠ Indtast 8 cifre';return;}
+  if(!navigator.onLine){msg.className='cvr-msg error';msg.textContent='📴 Kræver internet';return;}
+  msg.className='cvr-msg loading';msg.textContent='⏳ Henter...';btn.disabled=true;
+  try{
+    const r=await fetch(`https://cvrapi.dk/api?search=${cvr}&country=dk`,{headers:{'User-Agent':'SmartFakturaSystem/1.0'}});
+    if(!r.ok)throw new Error('HTTP '+r.status);
+    const d=await r.json();if(d.error)throw new Error(d.error);
+    if(isSender){
+      document.getElementById('senderName').value=d.name||'';
+      document.getElementById('senderAddress').value=d.address||'';
+      document.getElementById('senderZip').value=d.zipcode||'';
+      document.getElementById('senderCity2').value=d.city||'';
+      syncTopTitle();
+    }else{
+      document.getElementById('recvName').value=d.name||'';
+      document.getElementById('recvAddress').value=d.address||'';
+      document.getElementById('recvZip').value=d.zipcode||'';
+      document.getElementById('recvCity2').value=d.city||'';
+    }
+    msg.className='cvr-msg ok';msg.textContent='✓ Hentet: '+(d.name||'');
+    setTimeout(()=>{msg.className='cvr-msg';},3000);
+  }catch(e){msg.className='cvr-msg error';msg.textContent='✗ '+e.message;}
+  finally{btn.disabled=false;}
+}
+
+// ── LINES ──
+function addLine(){lines.push({desc:'',qty:1,price:0,vatType:'vat'});renderLines();}
+function removeLine(i){lines.splice(i,1);if(!lines.length)lines=[{desc:'',qty:1,price:0,vatType:'vat'}];renderLines();}
+function renderLines(){
+  const c=document.getElementById('lineList');c.innerHTML='';
+  lines.forEach((l,i)=>{
+    const iv=l.vatType!=='exempt';
+    const d=document.createElement('div');d.className='line-card';
+    d.innerHTML=`
+      <button class="line-del" onclick="removeLine(${i})">✕</button>
+      <div class="field"><label>Beskrivelse</label>
+        <input type="text" value="${esc(l.desc)}" placeholder="Produkt eller ydelse" oninput="lines[${i}].desc=this.value">
+      </div>
+      <div class="field-row">
+        <div class="field"><label>Antal</label>
+          <input type="number" value="${l.qty}" min="0" step="any" inputmode="decimal" oninput="lines[${i}].qty=parseFloat(this.value)||0">
+        </div>
+        <div class="field"><label>Enhedspris (kr.)</label>
+          <input type="number" value="${l.price}" min="0" step="0.01" inputmode="decimal" oninput="lines[${i}].price=parseFloat(this.value)||0">
+        </div>
+      </div>
+      <div class="vat-toggle">
+        <div class="vat-opt ${iv?'on-vat':''}" onclick="lines[${i}].vatType='vat';renderLines()">+ Moms</div>
+        <div class="vat-opt ${!iv?'on-exempt':''}" onclick="lines[${i}].vatType='exempt';renderLines()">Momsfrit</div>
+      </div>`;
+    c.appendChild(d);
+  });
+}
+
+// ── HELPERS ──
+function esc(s){return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
+function gv(id){return document.getElementById(id)?.value||'';}
+function fmt(n){return n.toLocaleString('da-DK',{minimumFractionDigits:2,maximumFractionDigits:2})+' kr.';}
+function senderCityFull(){return [gv('senderZip'),gv('senderCity2')].filter(Boolean).join(' ');}
+function recvCityFull(){return [gv('recvZip'),gv('recvCity2')].filter(Boolean).join(' ');}
+
+// ── INVOICE RENDER ──
+function renderInvoice(){
+  const isK=docType==='kredit',sign=isK?-1:1;
+  const vRate=parseFloat(gv('vatRate'))/100||0;
+  const sub=lines.reduce((s,l)=>s+l.qty*l.price,0);
+  const mf=lines.reduce((s,l)=>l.vatType==='exempt'?s+l.qty*l.price:s,0);
+  const mp=lines.reduce((s,l)=>l.vatType!=='exempt'?s+l.qty*l.price:s,0);
+  const vat=mp*vRate,tot=sub+vat;
+  const vpct=Math.round(parseFloat(gv('vatRate'))||0);
+  const rows=lines.map(l=>{const ac=isK?'inv-neg':'r';return `<tr class="irow">
+    <td>${esc(l.desc)}</td><td class="r">${l.qty}</td>
+    <td class="${ac}">${fmt(sign*l.price)}</td>
+    <td class="${ac}">${fmt(sign*l.qty*l.price)}</td></tr>`;}).join('');
+  const dw=isK?' style="color:#c0533a"':'',as=isK?' style="color:#c0533a"':'';
+  const cr=gv('creditRef');
+  const crH=isK&&cr?`<div class="inv-credit-ref">Krediteres fakturanr.: ${esc(cr)}</div>`:'';
+  document.getElementById('invoice').innerHTML=`
+    <div class="inv-top">${esc(gv('topTitle'))}</div>
+    <div class="inv-addrs">
+      <div class="inv-addr"><div class="inv-addr-name">${esc(gv('recvName'))}</div>
+        <div>${esc(gv('recvAddress'))}</div><div>${esc(recvCityFull())}</div><br>
+        <div>CVR-nr.: ${esc(gv('recvCVR'))}</div><div>${esc(gv('recvEmail'))}</div></div>
+      <div class="inv-addr inv-addr-right"><div class="inv-addr-name">${esc(gv('senderName'))}</div>
+        <div>${esc(gv('senderAddress'))}</div><div>${esc(senderCityFull())}</div><br>
+        <div>CVR-nr.: ${esc(gv('senderCVR'))}</div></div>
+    </div>
+    <div class="inv-head">
+      <div><div class="inv-word"${dw}>${isK?'Kreditnota':'Faktura'}</div>${crH}</div>
+      <div class="inv-meta">
+        <div class="inv-mg"><span class="inv-ml">${isK?'Kreditnotanr.:':'Fakturanr.:'}</span><span class="inv-mv">${esc(gv('invoiceNr'))}</span></div>
+        <div class="inv-mg"><span class="inv-ml">${isK?'Kreditdato:':'Fakturadato:'}</span><span class="inv-mv">${esc(gv('invoiceDate'))}</span></div>
+        ${!isK?`<div class="inv-mg"><span class="inv-ml">Seneste betaling:</span><span class="inv-mv">${esc(gv('dueDate'))}</span></div>`:''}
+      </div>
+    </div>
+    <table class="inv-tbl"><thead><tr>
+      <th>Beskrivelse</th><th class="r">Antal</th><th class="r">Enhedspris</th><th class="r">Pris</th>
+    </tr></thead><tbody>
+      ${rows}
+      <tr><td colspan="4" style="padding:0;border-top:1.5px solid #dde"></td></tr>
+      <tr>
+        <td style="padding-top:8px;color:#666;font-size:10px">
+          <div>Momsfrit beløb: &nbsp; ${fmt(sign*mf)}</div>
+          <div>Momspligtigt beløb: &nbsp; ${fmt(sign*mp)}</div>
+        </td>
+        <td></td>
+        <td class="r" style="padding-top:8px;vertical-align:top">
+          <div style="padding:3px 0">I alt ekskl. moms</div>
+          <div style="padding:3px 0">Moms (${vpct}%)</div>
+          <div style="padding:5px 0 3px;border-top:1.5px solid #dde;font-weight:700;margin-top:3px">I alt inkl. moms</div>
+        </td>
+        <td class="r" style="padding-top:8px;vertical-align:top">
+          <div style="padding:3px 0"${as}>${fmt(sign*sub)}</div>
+          <div style="padding:3px 0"${as}>${fmt(sign*vat)}</div>
+          <div style="padding:5px 0 3px;border-top:1.5px solid #dde;font-weight:700;margin-top:3px"${as}>${fmt(sign*tot)}</div>
+        </td>
+      </tr>
+    </tbody></table>
+    ${!isK?`<div class="inv-pay-note">${esc(gv('payNote'))}</div>
+    <div class="inv-pay-head">Betalingsmetoder</div>
+    <div class="inv-pay-det">${esc(gv('bankInfo'))}</div>`:''}
+    <div class="inv-foot">Side 1/1</div>`;
+}
+
+// ── DOWNLOAD ──
+function downloadHTML(){
+  const html=document.getElementById('invoice').innerHTML;
+  const label=docType==='kredit'?'kreditnota':'faktura';
+  const out=`<!DOCTYPE html><html lang="da"><head><meta charset="UTF-8"><title>${label}</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
+<style>*{box-sizing:border-box;margin:0;padding:0}body{padding:40px;background:#fff;font-family:'Inter',Helvetica,sans-serif;font-size:11px;color:#1a1d2e}
+.inv-top{text-align:center;font-size:13px;font-weight:700;margin-bottom:28px}
+.inv-addrs{display:flex;justify-content:space-between;margin-bottom:32px}
+.inv-addr{font-size:10.5px;line-height:1.75}.inv-addr-right{text-align:right}.inv-addr-name{font-weight:700}
+.inv-head{display:flex;align-items:baseline;border-bottom:1.5px solid #dde;padding-bottom:8px}
+.inv-word{font-size:30px;font-weight:300;line-height:1;margin-right:20px}
+.inv-meta{display:flex;align-items:baseline;flex:1;font-size:9.5px;flex-wrap:wrap}
+.inv-mg{display:flex;align-items:baseline;gap:3px;margin-right:14px}.inv-mg:last-child{margin-left:auto;margin-right:0}
+.inv-ml{color:#888}.inv-mv{font-weight:700}.inv-credit-ref{font-size:9.5px;color:#c0533a;margin-top:3px;font-weight:600}
+.inv-tbl{width:100%;border-collapse:collapse}.inv-tbl thead tr{border-bottom:1.5px solid #dde}
+.inv-tbl thead th{font-size:10px;font-weight:700;padding:6px 0;text-align:left}
+.inv-tbl thead th.r{text-align:right}.inv-tbl tbody td{padding:7px 0;font-size:10.5px;vertical-align:top}
+.inv-tbl tbody td.r{text-align:right}.inv-tbl .irow td{font-weight:600}
+.inv-neg{color:#c0533a;text-align:right}.inv-pay-note{margin-top:26px;font-size:10.5px}
+.inv-pay-head{font-size:19px;font-weight:400;margin-top:12px;margin-bottom:5px}.inv-pay-det{font-size:10.5px}
+.inv-foot{margin-top:60px;text-align:right;font-size:8.5px;color:#bbb}
+</style></head><body>${html}</body></html>`;
+  const a=document.createElement('a');
+  a.href=URL.createObjectURL(new Blob([out],{type:'text/html'}));
+  a.download=label+'.html';a.click();
+}
+
+// ── INIT ──
+renderLines();
+selectType('faktura');
+</script>
+</body>
+</html>
