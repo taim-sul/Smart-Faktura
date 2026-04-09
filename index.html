@@ -433,7 +433,7 @@ body{font-family:var(--sans);background:var(--bg);color:var(--ink);
       <div class="field">
         <label>CVR-nr. — hent oplysninger automatisk</label>
         <div class="cvr-wrap">
-          <input type="text" id="senderCVR" placeholder="12345678" maxlength="8" inputmode="numeric">
+          <input type="text" id="senderCVR" placeholder="12345678" maxlenghove"20" inputmode="numeric">
           <button class="cvr-btn" id="senderCVRBtn" onclick="fetchCVR('sender')">🔍 Hent</button>
         </div>
         <div class="cvr-msg" id="senderCVRMsg"></div>
@@ -441,7 +441,7 @@ body{font-family:var(--sans);background:var(--bg);color:var(--ink);
       <div class="field"><label>Firmanavn</label><input type="text" id="senderName" placeholder="Dit firma ApS" oninput="syncTopTitle()"></div>
       <div class="field"><label>Adresse</label><input type="text" id="senderAddress" placeholder="Vejnavn 1"></div>
       <div class="field-row">
-        <div class="field"><label>Postnummer</label><input type="text" id="senderZip" placeholder="1234" inputmode="numeric"></div>
+        <div class="field"><label>Postnummer</label><input type="text" id="senderZip" placeholder="12345678" inputmode="numeric"></div>
         <div class="field"><label>By</label><input type="text" id="senderCity2" placeholder="København"></div>
       </div>
     </div>
@@ -461,7 +461,7 @@ body{font-family:var(--sans);background:var(--bg);color:var(--ink);
       <div class="field">
         <label>CVR-nr. — hent oplysninger automatisk</label>
         <div class="cvr-wrap">
-          <input type="text" id="recvCVR" placeholder="12345678" maxlength="8" inputmode="numeric">
+          <input type="text" id="recvCVR" placeholder="12345678" maxlength="20" inputmode="numeric">
           <button class="cvr-btn" id="recvCVRBtn" onclick="fetchCVR('recv')">🔍 Hent</button>
         </div>
         <div class="cvr-msg" id="recvCVRMsg"></div>
@@ -469,7 +469,7 @@ body{font-family:var(--sans);background:var(--bg);color:var(--ink);
       <div class="field"><label>Navn / Firma</label><input type="text" id="recvName" placeholder="Kundens navn"></div>
       <div class="field"><label>Adresse</label><input type="text" id="recvAddress" placeholder="Vejnavn 1"></div>
       <div class="field-row">
-        <div class="field"><label>Postnummer</label><input type="text" id="recvZip" placeholder="1234" inputmode="numeric"></div>
+        <div class="field"><label>Postnummer</label><input type="text" id="recvZip" placeholder="12345678" inputmode="numeric"></div>
         <div class="field"><label>By</label><input type="text" id="recvCity2" placeholder="København"></div>
       </div>
       <div class="field"><label>Email</label><input type="email" id="recvEmail" placeholder="kunde@firma.dk"></div>
