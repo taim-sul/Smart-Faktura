@@ -135,6 +135,37 @@ body{font-family:var(--sans);background:var(--bg);color:var(--ink);
 .cvr-msg.error  {display:block;background:var(--red-bg);color:var(--red)}
 .cvr-msg.loading{display:block;background:var(--accent-bg);color:var(--accent)}
 
+/* LOGO UPLOAD */
+.logo-upload-area{border:2px dashed var(--border);border-radius:10px;padding:1.2rem;
+  display:flex;flex-direction:column;align-items:center;gap:.6rem;cursor:pointer;
+  transition:all .2s;background:#fff;text-align:center;position:relative}
+.logo-upload-area:hover{border-color:var(--accent);background:var(--accent-bg)}
+.logo-upload-area.has-logo{border-style:solid;border-color:var(--green);background:var(--green-bg)}
+.logo-upload-icon{font-size:1.8rem;line-height:1}
+.logo-upload-label{font-size:.85rem;font-weight:600;color:var(--muted)}
+.logo-upload-hint{font-size:.75rem;color:#b0b8c8}
+.logo-preview-wrap{display:none;flex-direction:column;align-items:center;gap:.6rem;width:100%}
+.logo-preview-wrap.show{display:flex}
+.logo-preview-img{max-height:80px;max-width:220px;object-fit:contain;border-radius:6px}
+.logo-remove-btn{font-family:var(--sans);font-size:.78rem;font-weight:600;
+  color:var(--red);background:var(--red-bg);border:1.5px solid #fcc;
+  border-radius:6px;padding:.3rem .8rem;cursor:pointer;transition:all .15s}
+.logo-remove-btn:hover{background:var(--red);color:#fff}
+#logoFileInput{display:none}
+
+/* PAYMENT TERMS */
+.pay-terms{display:grid;grid-template-columns:1fr 1fr;gap:.6rem}
+.pay-term-opt{border:2px solid var(--border);border-radius:9px;padding:.8rem .75rem;
+  cursor:pointer;transition:all .18s;display:flex;flex-direction:column;gap:.2rem;
+  background:#fff;text-align:left}
+.pay-term-opt:hover{border-color:var(--accent);background:var(--accent-bg)}
+.pay-term-opt.selected{border-color:var(--accent);background:var(--accent-bg)}
+.pay-term-label{font-size:.88rem;font-weight:700;color:var(--ink)}
+.pay-term-desc{font-size:.75rem;color:var(--muted);line-height:1.3}
+.pay-term-badge{display:inline-block;font-size:.68rem;font-weight:700;
+  padding:.15rem .4rem;border-radius:4px;background:var(--accent);color:#fff;margin-top:.2rem;
+  align-self:flex-start}
+
 /* DOC TYPE */
 .type-toggle{display:grid;grid-template-columns:1fr 1fr;gap:.8rem}
 .type-opt{border:2px solid var(--border);border-radius:10px;padding:1.2rem 1rem;
@@ -207,35 +238,69 @@ body{font-family:var(--sans);background:var(--bg);color:var(--ink);
 
 /* INVOICE */
 .invoice{background:#fff;width:100%;max-width:680px;margin:0 auto;
-  min-height:960px;padding:48px 48px 56px;
+  min-height:960px;padding:44px 48px 80px;
   box-shadow:0 0 0 1px #e0e0e0,0 4px 24px rgba(0,0,0,.1);
   font-family:'Inter',Helvetica,Arial,sans-serif;
-  font-size:11px;line-height:1.45;color:#1a1d2e;position:relative}
-@media(max-width:560px){.invoice{padding:24px 18px 36px;min-height:auto}}
-.inv-top{text-align:center;font-size:13px;font-weight:700;margin-bottom:28px}
-.inv-addrs{display:flex;justify-content:space-between;margin-bottom:32px}
-.inv-addr{font-size:10.5px;line-height:1.75}
-.inv-addr-right{text-align:right}
-.inv-addr-name{font-weight:700}
-.inv-head{display:flex;align-items:baseline;border-bottom:1.5px solid #dde;padding-bottom:8px}
-.inv-word{font-size:30px;font-weight:300;line-height:1;margin-right:20px;flex-shrink:0}
-.inv-meta{display:flex;align-items:baseline;flex:1;font-size:9.5px;flex-wrap:wrap;gap:2px 0}
-.inv-mg{display:flex;align-items:baseline;gap:3px;margin-right:14px}
-.inv-mg:last-child{margin-left:auto;margin-right:0}
-.inv-ml{color:#888}.inv-mv{font-weight:700}
-.inv-credit-ref{font-size:9.5px;color:#c0533a;margin-top:3px;font-weight:600}
-.inv-tbl{width:100%;border-collapse:collapse}
-.inv-tbl thead tr{border-bottom:1.5px solid #dde}
-.inv-tbl thead th{font-size:10px;font-weight:700;padding:6px 0;text-align:left;white-space:nowrap}
+  font-size:11px;line-height:1.5;color:#1a1d2e;position:relative}
+@media(max-width:560px){.invoice{padding:24px 18px 72px;min-height:auto}}
+
+/* Header: firmanavn centreret, logo til højre */
+.inv-header{position:relative;text-align:center;margin-bottom:32px;padding-bottom:18px;border-bottom:1px solid #ccc}
+.inv-header-logo{max-height:72px;max-width:200px;object-fit:contain;display:block;position:absolute;top:0;right:0}
+.inv-header-name{font-size:22px;font-weight:700;letter-spacing:-.3px;color:#1a1d2e;display:inline-block}
+
+/* Addr + meta row */
+.inv-top-row{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:36px;gap:16px}
+.inv-recv-block{font-size:10.5px;line-height:1.8;flex:1}
+.inv-recv-name{font-weight:700;font-size:11px}
+.inv-meta-box{border:1px solid #ccc;border-radius:4px;padding:10px 14px;
+  font-size:9.5px;min-width:200px;flex-shrink:0}
+.inv-meta-box-title{font-size:13px;font-weight:800;letter-spacing:.5px;
+  text-transform:uppercase;color:#1a1d2e;margin-bottom:8px;
+  padding-bottom:6px;border-bottom:1px solid #ccc}
+.inv-meta-row{display:flex;justify-content:space-between;gap:12px;padding:2px 0}
+.inv-meta-lbl{color:#888}
+.inv-meta-val{font-weight:700;text-align:right}
+.inv-credit-ref{font-size:9px;color:#c0533a;font-weight:600;margin-top:4px}
+
+/* Table */
+.inv-tbl{width:100%;border-collapse:collapse;margin-top:4px}
+.inv-tbl thead tr{border-bottom:1px solid #ccc}
+.inv-tbl thead th{font-size:10px;font-weight:700;padding:7px 6px 7px 0;text-align:left;white-space:nowrap;color:#444}
 .inv-tbl thead th.r{text-align:right}
-.inv-tbl tbody td{padding:7px 0;font-size:10.5px;vertical-align:top}
+.inv-tbl thead th.nr{width:28px;color:#aaa}
+.inv-tbl tbody td{padding:8px 6px 8px 0;font-size:10.5px;vertical-align:top;border-bottom:1px solid #f0f0f0}
 .inv-tbl tbody td.r{text-align:right}
-.inv-tbl .irow td{font-weight:600}
+.inv-tbl tbody td.nr{color:#aaa;font-size:9.5px}
+.inv-tbl .irow td{}
 .inv-neg{color:#c0533a;text-align:right}
-.inv-pay-note{margin-top:26px;font-size:10.5px}
-.inv-pay-head{font-size:19px;font-weight:400;margin-top:12px;margin-bottom:5px}
-.inv-pay-det{font-size:10.5px}
-.inv-foot{position:absolute;bottom:18px;right:48px;font-size:8.5px;color:#bbb}
+
+/* Totals */
+.inv-totals-row{display:flex;justify-content:space-between;align-items:flex-start;
+  margin-top:0;padding-top:12px;border-top:1px solid #ccc;gap:16px}
+.inv-vat-note{font-size:9.5px;color:#888;flex:1;padding-top:4px}
+.inv-totals-box{min-width:220px}
+.inv-total-line{display:flex;justify-content:space-between;gap:20px;
+  padding:3px 0;font-size:10.5px}
+.inv-total-line.bold{font-weight:700;font-size:11px;
+  border-top:1px solid #ccc;margin-top:4px;padding-top:7px}
+.inv-total-lbl{color:#555}
+.inv-total-lbl.dark{color:#1a1d2e}
+.inv-total-val{text-align:right;font-weight:600}
+.inv-total-val.bold{font-weight:800}
+
+/* Payment */
+.inv-payment{margin-top:28px;font-size:10px;line-height:1.7;color:#333;
+  border-top:1px solid #ccc;padding-top:16px}
+.inv-payment b{color:#1a1d2e}
+
+/* Footer */
+.inv-foot{position:absolute;bottom:0;left:0;right:0;
+  border-top:1px solid #ccc;padding:10px 48px;
+  font-size:8.5px;color:#999;
+  display:flex;justify-content:center;align-items:center;gap:6px;
+  text-align:center;line-height:1.5}
+@media(max-width:560px){.inv-foot{padding:10px 18px}}
 
 /* TOAST */
 #toast{position:fixed;bottom:calc(1.2rem + var(--safe-bottom));left:50%;
@@ -447,6 +512,21 @@ body{font-family:var(--sans);background:var(--bg);color:var(--ink);
         <div class="field"><label>Postnummer</label><input type="text" id="senderZip" placeholder="12345678" inputmode="numeric"></div>
         <div class="field"><label>By</label><input type="text" id="senderCity2" placeholder="København"></div>
       </div>
+      <div class="field">
+        <label>Firmalogo <span style="font-weight:400;color:var(--muted)">(valgfri — vises på fakturaen)</span></label>
+        <input type="file" id="logoFileInput" accept="image/*" onchange="handleLogoUpload(event)">
+        <div class="logo-upload-area" id="logoUploadArea" onclick="document.getElementById('logoFileInput').click()">
+          <div class="logo-preview-wrap" id="logoPreviewWrap">
+            <img id="logoPreviewImg" class="logo-preview-img" src="" alt="Logo">
+            <button class="logo-remove-btn" onclick="removeLogo(event)">✕ Fjern logo</button>
+          </div>
+          <div id="logoUploadEmpty">
+            <div class="logo-upload-icon">🖼️</div>
+            <div class="logo-upload-label">Klik for at uploade logo</div>
+            <div class="logo-upload-hint">PNG, JPG eller SVG — maks. 2 MB</div>
+          </div>
+        </div>
+      </div>
     </div>
     <div class="nav-btns">
       <button class="btn-back" onclick="goTo(0)">← Tilbage</button>
@@ -495,9 +575,38 @@ body{font-family:var(--sans);background:var(--bg);color:var(--ink);
         <label>Fakturanr. <span style="font-weight:400;color:var(--muted)">(valgfri)</span></label>
         <input type="text" id="invoiceNr" placeholder="F.eks. 2025-001">
       </div>
-      <div class="field-row">
-        <div class="field"><label>Fakturadato</label><input type="text" id="invoiceDate" placeholder="31. dec. 2025"></div>
-        <div class="field" id="dueDateField"><label>Betalingsfrist</label><input type="text" id="dueDate" placeholder="7. jan. 2026"></div>
+      <div class="field">
+        <label>Fakturadato</label>
+        <input type="text" id="invoiceDate" placeholder="31. dec. 2025" oninput="onInvoiceDateChange()">
+      </div>
+      <div class="field" id="dueDateField">
+        <label>Betalingsbetingelse</label>
+        <div class="pay-terms" id="payTerms">
+          <div class="pay-term-opt selected" data-term="immediate" onclick="selectPayTerm('immediate')">
+            <div class="pay-term-label">Omgående</div>
+            <div class="pay-term-desc">Betales ved modtagelse</div>
+            <div class="pay-term-badge">0 dage</div>
+          </div>
+          <div class="pay-term-opt" data-term="14" onclick="selectPayTerm('14')">
+            <div class="pay-term-label">14 dages net</div>
+            <div class="pay-term-desc">Forfald 14 dage efter fakturadato</div>
+            <div class="pay-term-badge">14 dage</div>
+          </div>
+          <div class="pay-term-opt" data-term="30" onclick="selectPayTerm('30')">
+            <div class="pay-term-label">30 dages net</div>
+            <div class="pay-term-desc">Forfald 30 dage efter fakturadato</div>
+            <div class="pay-term-badge">30 dage</div>
+          </div>
+          <div class="pay-term-opt" data-term="month" onclick="selectPayTerm('month')">
+            <div class="pay-term-label">Løbende md. +1</div>
+            <div class="pay-term-desc">Ultimo næste måned efter fakturadato</div>
+            <div class="pay-term-badge">Mdl.</div>
+          </div>
+        </div>
+        <div id="dueDateDisplay" style="margin-top:.6rem;font-size:.85rem;font-weight:600">
+          📅 <span id="dueDateText"></span>
+        </div>
+        <input type="hidden" id="dueDate">
       </div>
       <div class="field"><label>Momsprocent (%)</label><input type="number" id="vatRate" value="25" min="0" max="100" inputmode="numeric"></div>
     </div>
@@ -528,8 +637,56 @@ body{font-family:var(--sans);background:var(--bg);color:var(--ink);
       <div class="card-sub">Bankoplysninger der vises på fakturaen</div>
     </div>
     <div class="fields">
-      <div class="field"><label>Betalingsnote</label><input type="text" id="payNote" placeholder="Beløbet bedes indbetalt senest..."></div>
-      <div class="field"><label>Bankoplysninger</label><input type="text" id="bankInfo" placeholder="Reg.nr.: 0000. Kontonr.: 0000000000."></div>
+      <div class="field"><label>Betalingsnote</label><input type="text" id="payNote" placeholder="Udfyldes automatisk…" oninput="this.dataset.manual=this.value?'1':''"></div>
+
+      <!-- Bank type toggle -->
+      <div class="field">
+        <label>Kontotype</label>
+        <div class="type-toggle" style="grid-template-columns:1fr 1fr">
+          <div class="type-opt selected" id="opt-dk-bank" onclick="selectBankType('dk')">
+            <div class="type-icon">🏦</div>
+            <div class="type-label">Dansk konto</div>
+            <div class="type-desc">Regnr. + Kontonr.</div>
+          </div>
+          <div class="type-opt" id="opt-iban-bank" onclick="selectBankType('iban')">
+            <div class="type-icon">🌍</div>
+            <div class="type-label">Udenlandsk / IBAN</div>
+            <div class="type-desc">IBAN + SWIFT/BIC</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Dansk konto -->
+      <div id="bankDkFields" class="fields">
+        <div class="field"><label>Bank</label><input type="text" id="bankName" placeholder="F.eks. Danske Bank"></div>
+        <div class="field-row">
+          <div class="field"><label>Reg.nr.</label><input type="text" id="bankReg" placeholder="1234" maxlength="4" inputmode="numeric"></div>
+          <div class="field"><label>Kontonr.</label><input type="text" id="bankAccount" placeholder="0123456789" maxlength="10" inputmode="numeric"></div>
+        </div>
+      </div>
+
+      <!-- IBAN konto -->
+      <div id="bankIbanFields" class="fields" style="display:none">
+        <div class="field"><label>Bank</label><input type="text" id="bankNameIban" placeholder="F.eks. Deutsche Bank"></div>
+        <div class="field"><label>IBAN</label><input type="text" id="bankIban" placeholder="DE89 3704 0044 0532 0130 00" style="letter-spacing:.05em"></div>
+        <div class="field"><label>SWIFT / BIC</label><input type="text" id="bankSwift" placeholder="DEUTDEDB" style="text-transform:uppercase"></div>
+      </div>
+
+      <!-- Renter ved for sen betaling -->
+      <div class="field">
+        <label>Renter ved for sen betaling</label>
+        <div class="type-toggle" style="grid-template-columns:1fr 1fr">
+          <div class="type-opt selected" id="opt-interest-law" onclick="selectInterest('law')">
+            <div class="type-label" style="font-size:.85rem">Renteloven</div>
+            <div class="type-desc">Gældende lovpligtig rente</div>
+          </div>
+          <div class="type-opt" id="opt-interest-none" onclick="selectInterest('none')">
+            <div class="type-label" style="font-size:.85rem">Ingen rente</div>
+            <div class="type-desc">Ingen renteklausul</div>
+          </div>
+        </div>
+      </div>
+
     </div>
     <div class="nav-btns">
       <button class="btn-back" onclick="goTo(4)">← Tilbage</button>
@@ -607,7 +764,7 @@ function buildInvoiceText() {
     `  • ${l.desc || 'Ydelse'}: ${l.qty} × ${fmt(l.price)} = ${fmt(sign * l.qty * l.price)}`
   ).join('\n');
 
-  const bank = gv('bankInfo') ? `\n\nBetaling:\n${gv('bankInfo')}` : '';
+  const bank = buildBankInfoPlain() ? `\n\nBankoplysninger:\n${buildBankInfoPlain()}` : '';
   const note = gv('payNote') ? `\n${gv('payNote')}` : '';
 
   return `${label}${nr}${from}${to}${date}${due}
@@ -664,6 +821,193 @@ window.addEventListener('offline',()=>{const t=document.getElementById('toast');
 // ── STATE ──
 let docType='faktura', currentStep=0;
 let lines=[{desc:'',qty:1,price:0,vatType:'vat'}];
+let selectedPayTerm = 'immediate';
+let logoDataUrl = null;
+let bankType = 'dk';
+let interestType = 'law';
+
+// ── BANK TYPE ──
+function selectBankType(type) {
+  bankType = type;
+  document.getElementById('opt-dk-bank').className = 'type-opt' + (type === 'dk' ? ' selected' : '');
+  document.getElementById('opt-iban-bank').className = 'type-opt' + (type === 'iban' ? ' selected' : '');
+  document.getElementById('bankDkFields').style.display = type === 'dk' ? '' : 'none';
+  document.getElementById('bankIbanFields').style.display = type === 'iban' ? '' : 'none';
+}
+
+function selectInterest(type) {
+  interestType = type;
+  document.getElementById('opt-interest-law').className = 'type-opt' + (type === 'law' ? ' selected' : '');
+  document.getElementById('opt-interest-none').className = 'type-opt' + (type === 'none' ? ' selected' : '');
+}
+
+function buildBankInfo() {
+  if (bankType === 'iban') {
+    const name = gv('bankNameIban');
+    const iban = gv('bankIban');
+    const swift = gv('bankSwift');
+    const parts = [];
+    if (name) parts.push(name);
+    if (iban) parts.push('IBAN: ' + iban);
+    if (swift) parts.push('SWIFT/BIC: ' + swift);
+    return parts.join(' &nbsp;·&nbsp; ');
+  } else {
+    const name = gv('bankName');
+    const reg = gv('bankReg');
+    const acc = gv('bankAccount');
+    const parts = [];
+    if (name) parts.push(name);
+    if (reg) parts.push('Reg.nr.: ' + reg);
+    if (acc) parts.push('Kontonr.: ' + acc);
+    return parts.join(' &nbsp;·&nbsp; ');
+  }
+}
+
+function buildBankInfoPlain() {
+  if (bankType === 'iban') {
+    const name = gv('bankNameIban');
+    const iban = gv('bankIban');
+    const swift = gv('bankSwift');
+    return [name, iban ? 'IBAN: ' + iban : '', swift ? 'SWIFT/BIC: ' + swift : ''].filter(Boolean).join(' · ');
+  } else {
+    const name = gv('bankName');
+    const reg = gv('bankReg');
+    const acc = gv('bankAccount');
+    return [name, reg ? 'Reg.nr.: ' + reg : '', acc ? 'Kontonr.: ' + acc : ''].filter(Boolean).join(' · ');
+  }
+}
+
+// ── LOGO ──
+function handleLogoUpload(e) {
+  const file = e.target.files[0];
+  if (!file) return;
+  if (file.size > 2 * 1024 * 1024) {
+    alert('Filen er for stor. Maks. 2 MB.');
+    return;
+  }
+  const reader = new FileReader();
+  reader.onload = ev => {
+    logoDataUrl = ev.target.result;
+    document.getElementById('logoPreviewImg').src = logoDataUrl;
+    document.getElementById('logoPreviewWrap').classList.add('show');
+    document.getElementById('logoUploadEmpty').style.display = 'none';
+    document.getElementById('logoUploadArea').classList.add('has-logo');
+  };
+  reader.readAsDataURL(file);
+}
+
+function removeLogo(e) {
+  e.stopPropagation();
+  logoDataUrl = null;
+  document.getElementById('logoFileInput').value = '';
+  document.getElementById('logoPreviewImg').src = '';
+  document.getElementById('logoPreviewWrap').classList.remove('show');
+  document.getElementById('logoUploadEmpty').style.display = '';
+  document.getElementById('logoUploadArea').classList.remove('has-logo');
+}
+
+// ── PAYMENT TERMS ──
+const PAY_TERMS = {
+  immediate: { days: 0, label: 'Omgående betaling',    note: d => `Beløbet bedes indbetalt omgående ved modtagelse af denne faktura.` },
+  '14':      { days: 14, label: '14 dages betalingsfrist', note: d => `Beløbet bedes indbetalt senest ${d}.` },
+  '30':      { days: 30, label: '30 dages betalingsfrist', note: d => `Beløbet bedes indbetalt senest ${d}.` },
+  month:     { days: -1, label: 'Løbende måned + 1 måned', note: d => `Beløbet bedes indbetalt senest ${d} (løbende måned + 1 måned).` }
+};
+
+function selectPayTerm(term) {
+  selectedPayTerm = term;
+  document.querySelectorAll('.pay-term-opt').forEach(el => {
+    el.classList.toggle('selected', el.dataset.term === term);
+  });
+  recalcDueDate();
+}
+
+function parseDanishDate(str) {
+  if (!str || !str.trim()) return null;
+  const s = str.trim();
+  const months = {
+    jan:0,feb:1,mar:2,apr:3,maj:4,jun:5,
+    jul:6,aug:7,sep:8,okt:9,nov:10,dec:11
+  };
+  // Danish: "31. dec. 2025" or "31. december 2025"
+  const mDa = s.match(/^(\d{1,2})\.\s*([a-zæøå]+)\.?\s*(\d{4})$/i);
+  if (mDa) {
+    const mo = months[mDa[2].substring(0,3).toLowerCase()];
+    if (mo !== undefined) return new Date(parseInt(mDa[3]), mo, parseInt(mDa[1]));
+  }
+  // ISO: "2025-12-31"
+  const mIso = s.match(/^(\d{4})-(\d{1,2})-(\d{1,2})$/);
+  if (mIso) return new Date(parseInt(mIso[1]), parseInt(mIso[2])-1, parseInt(mIso[3]));
+  // Slash: "31/12/2025"
+  const mSlash = s.match(/^(\d{1,2})\/(\d{1,2})\/(\d{4})$/);
+  if (mSlash) return new Date(parseInt(mSlash[3]), parseInt(mSlash[2])-1, parseInt(mSlash[1]));
+  // Dot: "31.12.2025"
+  const mDot = s.match(/^(\d{1,2})\.(\d{1,2})\.(\d{4})$/);
+  if (mDot) return new Date(parseInt(mDot[3]), parseInt(mDot[2])-1, parseInt(mDot[1]));
+  return null;
+}
+
+function formatDanishDate(d) {
+  const months = ['jan.','feb.','mar.','apr.','maj','jun.','jul.','aug.','sep.','okt.','nov.','dec.'];
+  return `${d.getDate()}. ${months[d.getMonth()]} ${d.getFullYear()}`;
+}
+
+function calcDueDate(invoiceDate, term) {
+  const base = parseDanishDate(invoiceDate);
+  if (!base) return null;
+  if (term === 'immediate') {
+    return base;
+  } else if (term === 'month') {
+    // Ultimo next month: last day of the month after invoice month
+    const nextMonth = new Date(base.getFullYear(), base.getMonth() + 2, 0);
+    return nextMonth;
+  } else {
+    const days = parseInt(term);
+    return new Date(base.getTime() + days * 86400000);
+  }
+}
+
+function recalcDueDate() {
+  const invDate = gv('invoiceDate');
+  const due = calcDueDate(invDate, selectedPayTerm);
+  const display = document.getElementById('dueDateDisplay');
+  const txt = document.getElementById('dueDateText');
+  const inp = document.getElementById('dueDate');
+  const invField = document.getElementById('invoiceDate');
+
+  if (due) {
+    const formatted = formatDanishDate(due);
+    inp.value = formatted;
+    txt.textContent = formatted;
+    display.style.display = '';
+    display.style.color = 'var(--green)';
+    invField.style.borderColor = '';
+    autoFillPayNote(formatted);
+  } else {
+    inp.value = '';
+    display.style.display = '';
+    display.style.color = 'var(--red)';
+    txt.textContent = '← Indtast fakturadato ovenfor for at beregne forfald';
+    // Highlight the date field if user has picked a term but no date
+    if (selectedPayTerm) {
+      invField.style.borderColor = 'var(--accent)';
+      invField.focus();
+    }
+  }
+}
+
+function autoFillPayNote(dueDateStr) {
+  const noteEl = document.getElementById('payNote');
+  // Only auto-fill if empty or previously auto-filled
+  if (!noteEl.dataset.manual) {
+    const gen = PAY_TERMS[selectedPayTerm].note(dueDateStr);
+    noteEl.value = gen;
+  }
+}
+
+function onInvoiceDateChange() {
+  recalcDueDate();
+}
 
 // ── NAVIGATION ──
 function goTo(n){
@@ -801,58 +1145,103 @@ function renderInvoice(){
   const mp=lines.reduce((s,l)=>l.vatType!=='exempt'?s+l.qty*l.price:s,0);
   const vat=mp*vRate,tot=sub+vat;
   const vpct=Math.round(parseFloat(gv('vatRate'))||0);
-  const rows=lines.map(l=>{const ac=isK?'inv-neg':'r';return `<tr class="irow">
-    <td>${esc(l.desc)}</td><td class="r">${l.qty}</td>
-    <td class="${ac}">${fmt(sign*l.price)}</td>
-    <td class="${ac}">${fmt(sign*l.qty*l.price)}</td></tr>`;}).join('');
-  const dw=isK?' style="color:#c0533a"':'',as=isK?' style="color:#c0533a"':'';
   const cr=gv('creditRef');
-  const crH=isK&&cr?`<div class="inv-credit-ref">Krediteres fakturanr.: ${esc(cr)}</div>`:'';
+
+  // Line rows with numbering
+  const rows=lines.map((l,i)=>{
+    const ac=isK?'inv-neg':'r';
+    return `<tr class="irow">
+      <td class="nr">${i+1}</td>
+      <td>${esc(l.desc)}</td>
+      <td class="r">1</td>
+      <td class="r">${esc(String(l.qty))}</td>
+      <td class="${ac}">${fmt(sign*l.price)}</td>
+      <td class="${ac}">${fmt(sign*l.qty*l.price)}</td>
+    </tr>`;
+  }).join('');
+
+  const neg=isK?'color:#c0533a;':'';
+
+  // Header: firmanavn centreret, logo absolut til højre
+  const headerContent = logoDataUrl
+    ? `<img class="inv-header-logo" src="${logoDataUrl}" alt="Logo"><div class="inv-header-name" style="padding-right:220px">${esc(gv('topTitle'))}</div>`
+    : `<div class="inv-header-name">${esc(gv('topTitle'))}</div>`;
+
+  // Meta box label
+  const docLabel = isK ? 'KREDITNOTA' : 'FAKTURA';
+  const crLine = isK && cr ? `<div class="inv-credit-ref">Krediteres fakturanr.: ${esc(cr)}</div>` : '';
+
+  // Payment section
+  const bankHtml = buildBankInfo();
+  const invoiceNrRef = gv('invoiceNr') ? `<br>Fakturanr. <b>${esc(gv('invoiceNr'))}</b> bedes anført ved bankoverførsel` : '';
+  const interestHtml = interestType === 'law'
+    ? `<br><i>Ved for sen betaling påregnes rente i henhold til gældende rentelov.</i>`
+    : '';
+
+  const paySection = !isK ? `
+    <div class="inv-payment">
+      <b>Betalingsbetingelser:</b> ${esc(PAY_TERMS[selectedPayTerm]?.label||'')}${gv('dueDate') ? ` — forfald <b>${esc(gv('dueDate'))}</b>` : ''}<br>
+      ${bankHtml ? `<b>Bankoplysninger:</b> ${bankHtml}` : ''}${invoiceNrRef}
+      ${gv('payNote') ? `<br>${esc(gv('payNote'))}` : ''}
+      ${interestHtml}
+    </div>` : '';
+
+  // Footer with sender info
+  const footParts = [
+    gv('senderName'),
+    gv('senderAddress') ? gv('senderAddress') + (senderCityFull() ? ' · ' + senderCityFull() : '') : '',
+    gv('senderCVR') ? 'CVR-nr.: ' + gv('senderCVR') : ''
+  ].filter(Boolean);
+
   document.getElementById('invoice').innerHTML=`
-    <div class="inv-top">${esc(gv('topTitle'))}</div>
-    <div class="inv-addrs">
-      <div class="inv-addr"><div class="inv-addr-name">${esc(gv('recvName'))}</div>
-        <div>${esc(gv('recvAddress'))}</div><div>${esc(recvCityFull())}</div><br>
-        <div>CVR-nr.: ${esc(gv('recvCVR'))}</div><div>${esc(gv('recvEmail'))}</div></div>
-      <div class="inv-addr inv-addr-right"><div class="inv-addr-name">${esc(gv('senderName'))}</div>
-        <div>${esc(gv('senderAddress'))}</div><div>${esc(senderCityFull())}</div><br>
-        <div>CVR-nr.: ${esc(gv('senderCVR'))}</div></div>
-    </div>
-    <div class="inv-head">
-      <div><div class="inv-word"${dw}>${isK?'Kreditnota':'Faktura'}</div>${crH}</div>
-      <div class="inv-meta">
-        <div class="inv-mg"><span class="inv-ml">${isK?'Kreditnotanr.:':'Fakturanr.:'}</span><span class="inv-mv">${esc(gv('invoiceNr'))}</span></div>
-        <div class="inv-mg"><span class="inv-ml">${isK?'Kreditdato:':'Fakturadato:'}</span><span class="inv-mv">${esc(gv('invoiceDate'))}</span></div>
-        ${!isK?`<div class="inv-mg"><span class="inv-ml">Seneste betaling:</span><span class="inv-mv">${esc(gv('dueDate'))}</span></div>`:''}
+    <div class="inv-header">${headerContent}</div>
+
+    <div class="inv-top-row">
+      <div class="inv-recv-block">
+        <div class="inv-recv-name">${esc(gv('recvName'))}</div>
+        <div>${esc(gv('recvAddress'))}</div>
+        <div>${esc(recvCityFull())}</div>
+        ${gv('recvCVR')?`<div>CVR-nr.: ${esc(gv('recvCVR'))}</div>`:''}
+        ${gv('recvEmail')?`<div>${esc(gv('recvEmail'))}</div>`:''}
+      </div>
+      <div class="inv-meta-box">
+        <div class="inv-meta-box-title">${docLabel}</div>
+        ${crLine}
+        ${gv('invoiceNr')?`<div class="inv-meta-row"><span class="inv-meta-lbl">${isK?'Kreditnotanr.':'Fakturanr.'}</span><span class="inv-meta-val">${esc(gv('invoiceNr'))}</span></div>`:''}
+        <div class="inv-meta-row"><span class="inv-meta-lbl">${isK?'Kreditdato':'Fakturadato'}</span><span class="inv-meta-val">${esc(gv('invoiceDate'))}</span></div>
+        ${!isK&&gv('dueDate')?`<div class="inv-meta-row"><span class="inv-meta-lbl">Forfald</span><span class="inv-meta-val">${esc(gv('dueDate'))}</span></div>`:''}
+        ${gv('recvCVR')?`<div class="inv-meta-row"><span class="inv-meta-lbl">Kundenr.</span><span class="inv-meta-val">${esc(gv('recvCVR'))}</span></div>`:''}
+        <div class="inv-meta-row"><span class="inv-meta-lbl">Side</span><span class="inv-meta-val">1 af 1</span></div>
       </div>
     </div>
-    <table class="inv-tbl"><thead><tr>
-      <th>Beskrivelse</th><th class="r">Antal</th><th class="r">Enhedspris</th><th class="r">Pris</th>
-    </tr></thead><tbody>
-      ${rows}
-      <tr><td colspan="4" style="padding:0;border-top:1.5px solid #dde"></td></tr>
-      <tr>
-        <td style="padding-top:8px;color:#666;font-size:10px">
-          <div>Momsfrit beløb: &nbsp; ${fmt(sign*mf)}</div>
-          <div>Momspligtigt beløb: &nbsp; ${fmt(sign*mp)}</div>
-        </td>
-        <td></td>
-        <td class="r" style="padding-top:8px;vertical-align:top">
-          <div style="padding:3px 0">I alt ekskl. moms</div>
-          <div style="padding:3px 0">Moms (${vpct}%)</div>
-          <div style="padding:5px 0 3px;border-top:1.5px solid #dde;font-weight:700;margin-top:3px">I alt inkl. moms</div>
-        </td>
-        <td class="r" style="padding-top:8px;vertical-align:top">
-          <div style="padding:3px 0"${as}>${fmt(sign*sub)}</div>
-          <div style="padding:3px 0"${as}>${fmt(sign*vat)}</div>
-          <div style="padding:5px 0 3px;border-top:1.5px solid #dde;font-weight:700;margin-top:3px"${as}>${fmt(sign*tot)}</div>
-        </td>
-      </tr>
-    </tbody></table>
-    ${!isK?`<div class="inv-pay-note">${esc(gv('payNote'))}</div>
-    <div class="inv-pay-head">Betalingsmetoder</div>
-    <div class="inv-pay-det">${esc(gv('bankInfo'))}</div>`:''}
-    <div class="inv-foot">Side 1/1</div>`;
+
+    <table class="inv-tbl">
+      <thead><tr>
+        <th class="nr">Nr.</th>
+        <th>Tekst</th>
+        <th class="r">Antal</th>
+        <th class="r">Enhed</th>
+        <th class="r">Stk. pris</th>
+        <th class="r">Pris</th>
+      </tr></thead>
+      <tbody>${rows}</tbody>
+    </table>
+
+    <div class="inv-totals-row">
+      <div class="inv-vat-note">
+        Momsfrit beløb: ${fmt(sign*mf)}<br>
+        Momspligtigt beløb: ${fmt(sign*mp)}
+      </div>
+      <div class="inv-totals-box">
+        <div class="inv-total-line"><span class="inv-total-lbl">Subtotal</span><span class="inv-total-val" style="${neg}">${fmt(sign*sub)}</span></div>
+        <div class="inv-total-line"><span class="inv-total-lbl">${vpct},00% moms</span><span class="inv-total-val" style="${neg}">${fmt(sign*vat)}</span></div>
+        <div class="inv-total-line bold"><span class="inv-total-lbl dark">Total DKK</span><span class="inv-total-val bold" style="${neg}">${fmt(sign*tot)}</span></div>
+      </div>
+    </div>
+
+    ${paySection}
+
+    <div class="inv-foot">${footParts.join(' &nbsp;·&nbsp; ')}</div>`;
 }
 
 // ── DOWNLOAD ──
@@ -861,22 +1250,36 @@ function downloadHTML(){
   const label=docType==='kredit'?'kreditnota':'faktura';
   const out=`<!DOCTYPE html><html lang="da"><head><meta charset="UTF-8"><title>${label}</title>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
-<style>*{box-sizing:border-box;margin:0;padding:0}body{padding:40px;background:#fff;font-family:'Inter',Helvetica,sans-serif;font-size:11px;color:#1a1d2e}
-.inv-top{text-align:center;font-size:13px;font-weight:700;margin-bottom:28px}
-.inv-addrs{display:flex;justify-content:space-between;margin-bottom:32px}
-.inv-addr{font-size:10.5px;line-height:1.75}.inv-addr-right{text-align:right}.inv-addr-name{font-weight:700}
-.inv-head{display:flex;align-items:baseline;border-bottom:1.5px solid #dde;padding-bottom:8px}
-.inv-word{font-size:30px;font-weight:300;line-height:1;margin-right:20px}
-.inv-meta{display:flex;align-items:baseline;flex:1;font-size:9.5px;flex-wrap:wrap}
-.inv-mg{display:flex;align-items:baseline;gap:3px;margin-right:14px}.inv-mg:last-child{margin-left:auto;margin-right:0}
-.inv-ml{color:#888}.inv-mv{font-weight:700}.inv-credit-ref{font-size:9.5px;color:#c0533a;margin-top:3px;font-weight:600}
-.inv-tbl{width:100%;border-collapse:collapse}.inv-tbl thead tr{border-bottom:1.5px solid #dde}
-.inv-tbl thead th{font-size:10px;font-weight:700;padding:6px 0;text-align:left}
-.inv-tbl thead th.r{text-align:right}.inv-tbl tbody td{padding:7px 0;font-size:10.5px;vertical-align:top}
-.inv-tbl tbody td.r{text-align:right}.inv-tbl .irow td{font-weight:600}
-.inv-neg{color:#c0533a;text-align:right}.inv-pay-note{margin-top:26px;font-size:10.5px}
-.inv-pay-head{font-size:19px;font-weight:400;margin-top:12px;margin-bottom:5px}.inv-pay-det{font-size:10.5px}
-.inv-foot{margin-top:60px;text-align:right;font-size:8.5px;color:#bbb}
+<style>*{box-sizing:border-box;margin:0;padding:0}
+body{padding:40px;background:#fff;font-family:'Inter',Helvetica,sans-serif;font-size:11px;color:#1a1d2e}
+.inv-header{text-align:center;margin-bottom:32px;padding-bottom:20px;border-bottom:2px solid #1a1d2e}
+.inv-header-logo{max-height:72px;max-width:220px;object-fit:contain;display:block;margin:0 auto 8px}
+.inv-header-name{font-size:22px;font-weight:700;letter-spacing:-.3px}
+.inv-top-row{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:36px;gap:16px}
+.inv-recv-block{font-size:10.5px;line-height:1.8;flex:1}
+.inv-recv-name{font-weight:700;font-size:11px}
+.inv-meta-box{border:1px solid #dde;border-radius:6px;padding:10px 14px;font-size:9.5px;min-width:200px;flex-shrink:0}
+.inv-meta-box-title{font-size:13px;font-weight:800;letter-spacing:.5px;text-transform:uppercase;color:#1a1d2e;margin-bottom:8px;padding-bottom:6px;border-bottom:1.5px solid #1a1d2e}
+.inv-meta-row{display:flex;justify-content:space-between;gap:12px;padding:2px 0}
+.inv-meta-lbl{color:#888}.inv-meta-val{font-weight:700;text-align:right}
+.inv-credit-ref{font-size:9px;color:#c0533a;font-weight:600;margin-top:4px}
+.inv-tbl{width:100%;border-collapse:collapse;margin-top:4px}
+.inv-tbl thead tr{border-bottom:1.5px solid #1a1d2e}
+.inv-tbl thead th{font-size:10px;font-weight:700;padding:7px 6px 7px 0;text-align:left;white-space:nowrap;color:#444}
+.inv-tbl thead th.r{text-align:right}.inv-tbl thead th.nr{width:28px;color:#aaa}
+.inv-tbl tbody td{padding:8px 6px 8px 0;font-size:10.5px;vertical-align:top;border-bottom:1px solid #f0f0f0}
+.inv-tbl tbody td.r{text-align:right}.inv-tbl tbody td.nr{color:#aaa;font-size:9.5px}
+.inv-neg{color:#c0533a;text-align:right}
+.inv-totals-row{display:flex;justify-content:space-between;align-items:flex-start;margin-top:16px;gap:16px}
+.inv-vat-note{font-size:9.5px;color:#888;flex:1;padding-top:4px}
+.inv-totals-box{min-width:220px}
+.inv-total-line{display:flex;justify-content:space-between;gap:20px;padding:3px 0;font-size:10.5px}
+.inv-total-line.bold{font-weight:700;font-size:11px;border-top:1.5px solid #1a1d2e;margin-top:4px;padding-top:7px}
+.inv-total-lbl{color:#555}.inv-total-lbl.dark{color:#1a1d2e}
+.inv-total-val{text-align:right;font-weight:600}.inv-total-val.bold{font-weight:800}
+.inv-payment{margin-top:28px;font-size:10px;line-height:1.7;color:#333;border-top:1px solid #eee;padding-top:16px}
+.inv-payment b{color:#1a1d2e}
+.inv-foot{margin-top:48px;border-top:1px solid #e8eaf0;padding-top:10px;font-size:8.5px;color:#999;text-align:center}
 </style></head><body>${html}</body></html>`;
   const a=document.createElement('a');
   a.href=URL.createObjectURL(new Blob([out],{type:'text/html'}));
