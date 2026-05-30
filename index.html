@@ -244,10 +244,13 @@ body{font-family:var(--sans);background:var(--bg);color:var(--ink);
   font-size:11px;line-height:1.5;color:#1a1d2e;position:relative}
 @media(max-width:560px){.invoice{padding:24px 18px 72px;min-height:auto}}
 
-/* Header: firmanavn centreret, logo til højre */
-.inv-header{position:relative;text-align:center;margin-bottom:32px;padding-bottom:18px;border-bottom:1px solid #ccc}
-.inv-header-logo{max-height:72px;max-width:200px;object-fit:contain;display:block;position:absolute;top:0;right:0}
-.inv-header-name{font-size:22px;font-weight:700;letter-spacing:-.3px;color:#1a1d2e;display:inline-block}
+/* Header: logo flyder til højre, firmanavn centreret, linje fuld bredde */
+.inv-header{margin-bottom:32px;padding-bottom:18px;border-bottom:1px solid #ccc;overflow:hidden}
+.inv-header-logo{float:right;max-height:72px;max-width:200px;object-fit:contain;display:block;margin-left:16px}
+.inv-header-name{display:block;text-align:center;font-size:24px;font-weight:700;
+  letter-spacing:-.5px;color:#1a1d2e;
+  font-family:'Georgia','Times New Roman',serif;
+  line-height:1.2;padding:8px 0 4px}
 
 /* Addr + meta row */
 .inv-top-row{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:36px;gap:16px}
@@ -1147,29 +1150,40 @@ function renderInvoice(){
   const vpct=Math.round(parseFloat(gv('vatRate'))||0);
   const cr=gv('creditRef');
 
+  // Auto-detect: if total is negative, treat as credit note visually
+  const effectiveIsK = isK || (sign * tot) < 0;
+  const neg = effectiveIsK ? 'color:#c0533a;' : '';
+  const minus = effectiveIsK ? '−\u202f' : ''; // minus + narrow no-break space
+
+  const effectiveSub = Math.abs(sub);
+  const effectiveVat = Math.abs(vat);
+  const effectiveTot = Math.abs(tot);
+
+
   // Line rows with numbering
   const rows=lines.map((l,i)=>{
-    const ac=isK?'inv-neg':'r';
+    const lineTotal = l.qty*l.price;
+    const lineNeg = lineTotal < 0;
+    const ac = lineNeg ? 'inv-neg' : 'r';
+    const lineMinus = lineNeg ? '−\u202f' : '';
     return `<tr class="irow">
       <td class="nr">${i+1}</td>
       <td>${esc(l.desc)}</td>
       <td class="r">1</td>
       <td class="r">${esc(String(l.qty))}</td>
-      <td class="${ac}">${fmt(sign*l.price)}</td>
-      <td class="${ac}">${fmt(sign*l.qty*l.price)}</td>
+      <td class="${ac}">${lineMinus}${fmt(Math.abs(l.price))}</td>
+      <td class="${ac}">${lineMinus}${fmt(Math.abs(lineTotal))}</td>
     </tr>`;
   }).join('');
 
-  const neg=isK?'color:#c0533a;':'';
-
-  // Header: firmanavn centreret, logo absolut til højre
+  // Header: logo float right, firmanavn centreret, linje fuld bredde nedenunder
   const headerContent = logoDataUrl
-    ? `<img class="inv-header-logo" src="${logoDataUrl}" alt="Logo"><div class="inv-header-name" style="padding-right:220px">${esc(gv('topTitle'))}</div>`
+    ? `<img class="inv-header-logo" src="${logoDataUrl}" alt="Logo"><div class="inv-header-name">${esc(gv('topTitle'))}</div>`
     : `<div class="inv-header-name">${esc(gv('topTitle'))}</div>`;
 
-  // Meta box label
-  const docLabel = isK ? 'KREDITNOTA' : 'FAKTURA';
-  const crLine = isK && cr ? `<div class="inv-credit-ref">Krediteres fakturanr.: ${esc(cr)}</div>` : '';
+  // Meta box label — auto kreditnota if negative total
+  const docLabel = effectiveIsK ? 'KREDITNOTA' : 'FAKTURA';
+  const crLine = effectiveIsK && cr ? `<div class="inv-credit-ref">Krediteres fakturanr.: ${esc(cr)}</div>` : '';
 
   // Payment section
   const bankHtml = buildBankInfo();
@@ -1178,7 +1192,7 @@ function renderInvoice(){
     ? `<br><i>Ved for sen betaling påregnes rente i henhold til gældende rentelov.</i>`
     : '';
 
-  const paySection = !isK ? `
+  const paySection = !effectiveIsK ? `
     <div class="inv-payment">
       <b>Betalingsbetingelser:</b> ${esc(PAY_TERMS[selectedPayTerm]?.label||'')}${gv('dueDate') ? ` — forfald <b>${esc(gv('dueDate'))}</b>` : ''}<br>
       ${bankHtml ? `<b>Bankoplysninger:</b> ${bankHtml}` : ''}${invoiceNrRef}
@@ -1207,9 +1221,9 @@ function renderInvoice(){
       <div class="inv-meta-box">
         <div class="inv-meta-box-title">${docLabel}</div>
         ${crLine}
-        ${gv('invoiceNr')?`<div class="inv-meta-row"><span class="inv-meta-lbl">${isK?'Kreditnotanr.':'Fakturanr.'}</span><span class="inv-meta-val">${esc(gv('invoiceNr'))}</span></div>`:''}
-        <div class="inv-meta-row"><span class="inv-meta-lbl">${isK?'Kreditdato':'Fakturadato'}</span><span class="inv-meta-val">${esc(gv('invoiceDate'))}</span></div>
-        ${!isK&&gv('dueDate')?`<div class="inv-meta-row"><span class="inv-meta-lbl">Forfald</span><span class="inv-meta-val">${esc(gv('dueDate'))}</span></div>`:''}
+        ${gv('invoiceNr')?`<div class="inv-meta-row"><span class="inv-meta-lbl">${effectiveIsK?'Kreditnotanr.':'Fakturanr.'}</span><span class="inv-meta-val">${esc(gv('invoiceNr'))}</span></div>`:''}
+        <div class="inv-meta-row"><span class="inv-meta-lbl">${effectiveIsK?'Kreditdato':'Fakturadato'}</span><span class="inv-meta-val">${esc(gv('invoiceDate'))}</span></div>
+        ${!effectiveIsK&&gv('dueDate')?`<div class="inv-meta-row"><span class="inv-meta-lbl">Forfald</span><span class="inv-meta-val">${esc(gv('dueDate'))}</span></div>`:''}
         ${gv('recvCVR')?`<div class="inv-meta-row"><span class="inv-meta-lbl">Kundenr.</span><span class="inv-meta-val">${esc(gv('recvCVR'))}</span></div>`:''}
         <div class="inv-meta-row"><span class="inv-meta-lbl">Side</span><span class="inv-meta-val">1 af 1</span></div>
       </div>
@@ -1229,13 +1243,13 @@ function renderInvoice(){
 
     <div class="inv-totals-row">
       <div class="inv-vat-note">
-        Momsfrit beløb: ${fmt(sign*mf)}<br>
-        Momspligtigt beløb: ${fmt(sign*mp)}
+        Momsfrit beløb: ${minus}${fmt(Math.abs(mf))}<br>
+        Momspligtigt beløb: ${minus}${fmt(Math.abs(mp))}
       </div>
       <div class="inv-totals-box">
-        <div class="inv-total-line"><span class="inv-total-lbl">Subtotal</span><span class="inv-total-val" style="${neg}">${fmt(sign*sub)}</span></div>
-        <div class="inv-total-line"><span class="inv-total-lbl">${vpct},00% moms</span><span class="inv-total-val" style="${neg}">${fmt(sign*vat)}</span></div>
-        <div class="inv-total-line bold"><span class="inv-total-lbl dark">Total DKK</span><span class="inv-total-val bold" style="${neg}">${fmt(sign*tot)}</span></div>
+        <div class="inv-total-line"><span class="inv-total-lbl">Subtotal</span><span class="inv-total-val" style="${neg}">${minus}${fmt(effectiveSub)}</span></div>
+        <div class="inv-total-line"><span class="inv-total-lbl">${vpct},00% moms</span><span class="inv-total-val" style="${neg}">${minus}${fmt(effectiveVat)}</span></div>
+        <div class="inv-total-line bold"><span class="inv-total-lbl dark">Total DKK</span><span class="inv-total-val bold" style="${neg}">${minus}${fmt(effectiveTot)}</span></div>
       </div>
     </div>
 
