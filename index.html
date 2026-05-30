@@ -28,6 +28,8 @@
 </script>
 <link rel="apple-touch-icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 180 180'%3E%3Crect width='180' height='180' rx='40' fill='%231a1d2e'/%3E%3Crect x='36' y='28' width='108' height='136' rx='8' fill='%23fff'/%3E%3Crect x='52' y='52' width='76' height='12' rx='3' fill='%234f7fff'/%3E%3Crect x='36' y='104' width='108' height='2' fill='%23ddd'/%3E%3Crect x='96' y='130' width='48' height='10' rx='3' fill='%234f7fff'/%3E%3C/svg%3E">
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 <style>
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
 :root{
@@ -297,13 +299,14 @@ body{font-family:var(--sans);background:var(--bg);color:var(--ink);
 .share-divider{display:flex;align-items:center;gap:.5rem;color:var(--muted);font-size:.78rem}
 .share-divider::before,.share-divider::after{content:'';flex:1;height:1px;background:var(--border)}
 
-/* PRINT */
+/* PRINT - keep for fallback */
 @media print{
-  #toast,#iosHint,.topbar,.progress-bar,.preview-toolbar{display:none!important}
+  #toast,#iosHint,.topbar,.progress-bar,.preview-toolbar,#pwaInstallBanner,#shareModal{display:none!important}
   .main{padding:0;overflow:visible}
   .preview-card{box-shadow:none;border:none}
   .preview-doc-wrap{padding:0}
   .invoice{box-shadow:none;min-height:auto;padding:10mm 14mm}
+  body > *:not(.main){display:none!important}
 }
 </style>
 </head>
@@ -370,7 +373,7 @@ body{font-family:var(--sans);background:var(--bg);color:var(--ink);
       <span class="tb-title">Smart Faktura System</span>
     </div>
     <div class="tb-actions">
-      <button class="tb-btn tb-btn-ghost" onclick="window.print()">🖨 Udskriv</button>
+      <button class="tb-btn tb-btn-ghost" onclick="generatePDF()">🖨 Print PDF</button>
       <button class="tb-btn tb-btn-primary" onclick="downloadHTML()">↓ Download</button>
     </div>
   </div>
@@ -542,7 +545,7 @@ body{font-family:var(--sans);background:var(--bg);color:var(--ink);
         <span class="prev-title" id="prevTitle">Faktura klar ✓</span>
       </div>
       <div class="preview-actions">
-        <button class="prev-btn prev-print" onclick="window.print()">🖨 Udskriv</button>
+        <button class="prev-btn prev-print" onclick="generatePDF()">🖨 Print PDF</button>
         <button class="prev-btn prev-share-email" onclick="openShare()">📤 Del</button>
         <button class="prev-btn prev-dl" onclick="downloadHTML()">↓ Download</button>
       </div>
@@ -878,6 +881,73 @@ function downloadHTML(){
   const a=document.createElement('a');
   a.href=URL.createObjectURL(new Blob([out],{type:'text/html'}));
   a.download=label+'.html';a.click();
+}
+
+// ── PDF GENERATION ──
+async function generatePDF(){
+  // Make sure invoice is rendered first
+  if(!document.getElementById('step-preview').classList.contains('active')){
+    renderInvoice();
+  }
+  const el = document.getElementById('invoice');
+  const label = docType === 'kredit' ? 'kreditnota' : 'faktura';
+  const nr = gv('invoiceNr') ? '-' + gv('invoiceNr') : '';
+  const filename = label + nr + '.pdf';
+
+  // Show loading state
+  const btn = document.querySelector('.prev-btn.prev-print, .tb-btn-ghost');
+  const origText = btn ? btn.textContent : '';
+  if(btn) btn.textContent = '⏳ Genererer...';
+
+  try {
+    const canvas = await html2canvas(el, {
+      scale: 2,
+      useCORS: true,
+      backgroundColor: '#ffffff',
+      logging: false,
+      windowWidth: el.scrollWidth,
+      windowHeight: el.scrollHeight
+    });
+
+    const { jsPDF } = window.jspdf;
+    const pdf = new jsPDF({ orientation: 'portrait', unit: 'mm', format: 'a4' });
+
+    const pageW = pdf.internal.pageSize.getWidth();
+    const pageH = pdf.internal.pageSize.getHeight();
+    const margin = 10;
+    const imgW = pageW - margin * 2;
+    const imgH = (canvas.height * imgW) / canvas.width;
+
+    const imgData = canvas.toDataURL('image/png');
+
+    if(imgH <= pageH - margin * 2){
+      pdf.addImage(imgData, 'PNG', margin, margin, imgW, imgH);
+    } else {
+      // Multi-page support
+      let yPos = 0;
+      let pageNum = 0;
+      const pageImgH = pageH - margin * 2;
+      const ratio = canvas.width / imgW;
+      while(yPos < imgH){
+        if(pageNum > 0) pdf.addPage();
+        const sliceH = Math.min(pageImgH, imgH - yPos);
+        const sliceCanvas = document.createElement('canvas');
+        sliceCanvas.width = canvas.width;
+        sliceCanvas.height = sliceH * ratio;
+        const ctx = sliceCanvas.getContext('2d');
+        ctx.drawImage(canvas, 0, yPos * ratio, canvas.width, sliceH * ratio, 0, 0, canvas.width, sliceH * ratio);
+        pdf.addImage(sliceCanvas.toDataURL('image/png'), 'PNG', margin, margin, imgW, sliceH);
+        yPos += sliceH;
+        pageNum++;
+      }
+    }
+
+    pdf.save(filename);
+  } catch(e) {
+    alert('PDF-generering fejlede: ' + e.message);
+  } finally {
+    if(btn) btn.textContent = origText;
+  }
 }
 
 // ── INIT ──
