@@ -1332,30 +1332,43 @@ async function generatePDF(){
     const pageW = pdf.internal.pageSize.getWidth();
     const pageH = pdf.internal.pageSize.getHeight();
     const margin = 10;
-    const imgW = pageW - margin * 2;
-    const imgH = (canvas.height * imgW) / canvas.width;
+    const usableW = pageW - margin * 2;
+    const usableH = pageH - margin * 2;
+
+    // Natural height if we fill the usable width
+    const naturalH = (canvas.height * usableW) / canvas.width;
 
     const imgData = canvas.toDataURL('image/png');
 
-    if(imgH <= pageH - margin * 2){
-      pdf.addImage(imgData, 'PNG', margin, margin, imgW, imgH);
+    if (naturalH <= usableH) {
+      // Fits on one page — place as-is
+      pdf.addImage(imgData, 'PNG', margin, margin, usableW, naturalH);
     } else {
-      // Multi-page support
-      let yPos = 0;
-      let pageNum = 0;
-      const pageImgH = pageH - margin * 2;
-      const ratio = canvas.width / imgW;
-      while(yPos < imgH){
-        if(pageNum > 0) pdf.addPage();
-        const sliceH = Math.min(pageImgH, imgH - yPos);
-        const sliceCanvas = document.createElement('canvas');
-        sliceCanvas.width = canvas.width;
-        sliceCanvas.height = sliceH * ratio;
-        const ctx = sliceCanvas.getContext('2d');
-        ctx.drawImage(canvas, 0, yPos * ratio, canvas.width, sliceH * ratio, 0, 0, canvas.width, sliceH * ratio);
-        pdf.addImage(sliceCanvas.toDataURL('image/png'), 'PNG', margin, margin, imgW, sliceH);
-        yPos += sliceH;
-        pageNum++;
+      // Too tall for one page even at full width — check if scaling down fits
+      const scale = usableH / naturalH;
+      if (scale >= 0.5) {
+        // Scale down to fit on one page (max 50% reduction before it gets unreadable)
+        const scaledW = usableW * scale;
+        const scaledH = naturalH * scale;
+        const xOffset = margin + (usableW - scaledW) / 2;
+        pdf.addImage(imgData, 'PNG', xOffset, margin, scaledW, scaledH);
+      } else {
+        // Genuinely too much content — split across pages cleanly
+        let yPos = 0;
+        let pageNum = 0;
+        const ratio = canvas.width / usableW;
+        while (yPos < naturalH) {
+          if (pageNum > 0) pdf.addPage();
+          const sliceH = Math.min(usableH, naturalH - yPos);
+          const sliceCanvas = document.createElement('canvas');
+          sliceCanvas.width = canvas.width;
+          sliceCanvas.height = Math.round(sliceH * ratio);
+          const ctx = sliceCanvas.getContext('2d');
+          ctx.drawImage(canvas, 0, Math.round(yPos * ratio), canvas.width, sliceCanvas.height, 0, 0, canvas.width, sliceCanvas.height);
+          pdf.addImage(sliceCanvas.toDataURL('image/png'), 'PNG', margin, margin, usableW, sliceH);
+          yPos += sliceH;
+          pageNum++;
+        }
       }
     }
 
