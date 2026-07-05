@@ -367,6 +367,62 @@ body{font-family:var(--sans);background:var(--bg);color:var(--ink);
 .share-divider{display:flex;align-items:center;gap:.5rem;color:var(--muted);font-size:.78rem}
 .share-divider::before,.share-divider::after{content:'';flex:1;height:1px;background:var(--border)}
 
+.se-qr-wrap{display:flex;flex-direction:column;align-items:center;gap:4px;flex-shrink:0}
+.se-qr-canvas{width:80px;height:80px;image-rendering:pixelated}
+.se-qr-lbl{font-size:7.5px;color:#888;text-align:center;max-width:80px;line-height:1.3}
+
+/* SE INVOICE LAYOUT */
+.inv-se{background:#fff;width:100%;max-width:680px;margin:0 auto;
+  min-height:960px;padding:32px 40px 0;
+  box-shadow:0 0 0 1px #e0e0e0,0 4px 24px rgba(0,0,0,.1);
+  font-family:'Inter',Helvetica,Arial,sans-serif;
+  font-size:10.5px;line-height:1.5;color:#1a1d2e;position:relative}
+@media(max-width:560px){.inv-se{padding:20px 16px 0;min-height:auto}}
+
+.se-topbar{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:32px}
+.se-sender-name{font-size:18px;font-weight:700;color:#1a1d2e}
+.se-doc-title{text-align:right}
+.se-doc-word{font-size:18px;font-weight:700;display:block;color:#1a1d2e}
+.se-doc-meta{display:flex;gap:8px;justify-content:flex-end;font-size:10px;margin-top:2px}
+.se-doc-lbl{font-weight:700}
+.se-doc-nr{font-weight:400}
+
+.se-recv-box{border:1px solid #ccc;padding:10px 14px;font-size:10.5px;
+  line-height:1.7;display:inline-block;min-width:220px;margin-bottom:20px}
+
+.se-meta-tbl{border-collapse:collapse;font-size:10px;margin-bottom:8px}
+.se-meta-tbl td{padding:2px 16px 2px 0;vertical-align:top}
+.se-meta-lbl{font-weight:700;white-space:nowrap}
+.se-meta-val{color:#1a1d2e}
+
+/* reuse inv-tbl for SE too */
+.inv-se .inv-tbl{width:100%;border-collapse:collapse}
+.inv-se .inv-tbl thead tr{border-top:1.5px solid #1a1d2e;border-bottom:1px solid #ccc}
+.inv-se .inv-tbl thead th{font-size:10px;font-weight:700;padding:6px 4px;text-align:left;color:#1a1d2e}
+.inv-se .inv-tbl thead th.r{text-align:right}
+.inv-se .inv-tbl thead th.nr{width:36px}
+.inv-se .inv-tbl tbody td{padding:7px 4px;font-size:10.5px;vertical-align:top;border-bottom:1px solid #f0f0f0}
+.inv-se .inv-tbl tbody td.r{text-align:right}
+.inv-se .inv-tbl tbody td.nr{font-size:9.5px}
+
+.se-bottom-area{display:flex;justify-content:space-between;align-items:flex-end;
+  margin-top:16px;border-top:1.5px solid #1a1d2e;padding-top:10px;gap:16px}
+.se-totals-left{font-size:10px;line-height:2}
+.se-total-row{display:flex;gap:24px;justify-content:space-between;min-width:160px}
+
+.se-pay-box{border:1px solid #ccc;padding:10px 14px;font-size:9.5px;
+  line-height:1.8;min-width:240px;flex-shrink:0}
+.se-pay-row{display:flex;justify-content:space-between;gap:16px}
+.se-pay-hint{font-style:italic;color:#888;font-size:8.5px;margin-bottom:2px}
+.se-att-betala{display:flex;justify-content:space-between;gap:16px;
+  font-weight:700;font-size:11px;border-top:1px solid #ccc;
+  margin-top:6px;padding-top:6px}
+
+.se-footer{border-top:1.5px solid #1a1d2e;margin-top:20px;padding:10px 0 14px;
+  display:grid;grid-template-columns:1fr 1fr 1fr;gap:16px;font-size:9px;line-height:1.7}
+.se-foot-col{}
+.se-foot-head{font-weight:700;font-size:9px}
+
 /* LAYOUT TOGGLE in toolbar */
 .layout-toggle{display:flex;gap:2px;background:#f3f4f6;border-radius:6px;padding:2px}
 .layout-btn{font-family:var(--sans);font-size:.75rem;font-weight:600;
@@ -542,16 +598,21 @@ body{font-family:var(--sans);background:var(--bg);color:var(--ink);
       <div class="card-heading">Hvad vil du oprette?</div>
       <div class="card-sub">Vælg dokumenttype for at komme i gang</div>
     </div>
-    <div class="type-toggle">
+    <div class="type-toggle" style="grid-template-columns:1fr 1fr 1fr">
       <div class="type-opt selected" id="opt-faktura" onclick="selectType('faktura')">
         <div class="type-icon">📄</div>
         <div class="type-label">Faktura</div>
-        <div class="type-desc">Send en faktura til en kunde</div>
+        <div class="type-desc">Dansk faktura til kunde</div>
       </div>
       <div class="type-opt" id="opt-kredit" onclick="selectType('kredit')">
         <div class="type-icon">↩️</div>
         <div class="type-label">Kreditnota</div>
         <div class="type-desc">Kreditér en eksisterende faktura</div>
+      </div>
+      <div class="type-opt" id="opt-se" onclick="selectType('se')">
+        <div class="type-icon">🇸🇪</div>
+        <div class="type-label">SE Faktura</div>
+        <div class="type-desc">Svensk faktura med OCR og IBAN</div>
       </div>
     </div>
     <div class="field" id="creditRefWrap" style="display:none">
@@ -570,13 +631,22 @@ body{font-family:var(--sans);background:var(--bg);color:var(--ink);
       <div class="card-sub">Oplysninger om dit firma</div>
     </div>
     <div class="fields">
-      <div class="field">
+      <!-- DK CVR lookup -->
+      <div class="field" id="senderCVRField">
         <label>CVR-nr. — hent oplysninger automatisk</label>
         <div class="cvr-wrap">
-          <input type="text" id="senderCVR" placeholder="12345678" maxlenghove"20" inputmode="numeric">
+          <input type="text" id="senderCVR" placeholder="12345678" maxlength="20" inputmode="numeric">
           <button class="cvr-btn" id="senderCVRBtn" onclick="fetchCVR('sender')">🔍 Hent</button>
         </div>
         <div class="cvr-msg" id="senderCVRMsg"></div>
+      </div>
+      <!-- SE org.nr lookup -->
+      <div class="field" id="senderSELookupField" style="display:none">
+        <label>Organisationsnummer</label>
+        <div class="cvr-wrap">
+          <input type="text" id="senderOrgNrLookup" placeholder="556123-4567" maxlength="13" inputmode="numeric" oninput="formatOrgNr(this)">
+        </div>
+        <div style="font-size:.78rem;color:var(--muted);margin-top:.25rem">Udfyld firma og adresse manuelt nedenfor</div>
       </div>
       <div class="field"><label>Firmanavn</label><input type="text" id="senderName" placeholder="Dit firma ApS" oninput="syncTopTitle()"></div>
       <div class="field"><label>Adresse</label><input type="text" id="senderAddress" placeholder="Vejnavn 1"></div>
@@ -591,6 +661,27 @@ body{font-family:var(--sans);background:var(--bg);color:var(--ink);
           <div class="field"><label>Telefon</label><input type="text" id="senderPhone" placeholder="50808044" inputmode="tel"></div>
         </div>
         <div class="field"><label>E-mail (afsender)</label><input type="email" id="senderEmail" placeholder="faktura@firma.dk"></div>
+      </div>
+      <!-- SE-only fields -->
+      <div id="seSenderFields" style="display:none" class="fields">
+        <div class="field"><label>Organisationsnummer</label><input type="text" id="senderOrgNr" placeholder="559421-4537"></div>
+        <div class="field-row">
+          <div class="field"><label>Telefon</label><input type="text" id="senderPhoneSE" placeholder="004522207573" inputmode="tel"></div>
+          <div class="field"><label>E-post</label><input type="email" id="senderEmailSE" placeholder="info@firma.se"></div>
+        </div>
+        <div class="field">
+          <label>Skattstatus</label>
+          <div class="type-toggle" style="grid-template-columns:1fr 1fr">
+            <div class="type-opt selected" id="opt-fskatt-yes" onclick="selectFSkatt(true)">
+              <div class="type-label" style="font-size:.85rem">Godkänd för F-skatt</div>
+              <div class="type-desc">Momsregistrerad</div>
+            </div>
+            <div class="type-opt" id="opt-fskatt-no" onclick="selectFSkatt(false)">
+              <div class="type-label" style="font-size:.85rem">Ej F-skatt</div>
+              <div class="type-desc">Uregistrerad</div>
+            </div>
+          </div>
+        </div>
       </div>
       <div class="field">
         <label>Firmalogo <span style="font-weight:400;color:var(--muted)">(valgfri — vises på fakturaen)</span></label>
@@ -621,24 +712,55 @@ body{font-family:var(--sans);background:var(--bg);color:var(--ink);
       <div class="card-sub">Hvem modtager fakturaen?</div>
     </div>
     <div class="fields">
-      <div class="field">
+      <!-- DK CVR lookup (non-SE types) -->
+      <div class="field" id="recvCVRField">
         <label>CVR-nr. — hent oplysninger automatisk</label>
         <div class="cvr-wrap">
           <input type="text" id="recvCVR" placeholder="12345678" maxlength="20" inputmode="numeric">
-          <button class="cvr-btn" id="recvCVRBtn" onclick="fetchCVR('recv')">🔍 Hent</button>
+          <button class="cvr-btn" id="recvCVRBtn" onclick="fetchCVR('recv')">&#128269; Hent</button>
         </div>
         <div class="cvr-msg" id="recvCVRMsg"></div>
+      </div>
+      <!-- SE: DK/SE toggle lookup block -->
+      <div id="recvSELookupBlock" style="display:none">
+        <div class="field">
+          <label>Kundregister — vælg land</label>
+          <div class="layout-toggle" style="margin-bottom:.5rem">
+            <button class="layout-btn active" id="recvLookupDK" onclick="setRecvLookupMode('dk')">&#127465;&#127472; DK CVR</button>
+            <button class="layout-btn" id="recvLookupSE" onclick="setRecvLookupMode('se')">&#127480;&#127466; SE Org.nr</button>
+          </div>
+          <div id="recvLookupDKPanel">
+            <div class="cvr-wrap">
+              <input type="text" id="recvCVRse" placeholder="12345678" maxlength="20" inputmode="numeric">
+              <button class="cvr-btn" onclick="fetchCVRForSE()">&#128269; Hent</button>
+            </div>
+            <div class="cvr-msg" id="recvCVRsemsg"></div>
+          </div>
+          <div id="recvLookupSEPanel" style="display:none">
+            <div class="cvr-wrap">
+              <input type="text" id="recvOrgNrLookup" placeholder="556123-4567" maxlength="13" inputmode="numeric" oninput="formatOrgNr(this)">
+              <button class="cvr-btn" id="recvOrgBtn" onclick="fetchSECompany('recv')">&#128269; Hämta</button>
+            </div>
+            <div class="cvr-msg" id="recvSEMsg"></div>
+          </div>
+        </div>
       </div>
       <div class="field"><label>Navn / Firma</label><input type="text" id="recvName" placeholder="Kundens navn"></div>
       <div class="field"><label>Adresse</label><input type="text" id="recvAddress" placeholder="Vejnavn 1"></div>
       <div class="field-row">
-        <div class="field"><label>Postnummer</label><input type="text" id="recvZip" placeholder="12345678" inputmode="numeric"></div>
+        <div class="field"><label>Postnummer</label><input type="text" id="recvZip" placeholder="1234" inputmode="numeric"></div>
         <div class="field"><label>By</label><input type="text" id="recvCity2" placeholder="København"></div>
       </div>
       <div class="field"><label>Email</label><input type="email" id="recvEmail" placeholder="kunde@firma.dk"></div>
       <!-- Klassisk-only -->
       <div id="klassiskRecvFields" style="display:none" class="fields">
         <div class="field"><label>Att. / Deres ref.</label><input type="text" id="recvRef" placeholder="F.eks. Aaron Sultan"></div>
+      </div>
+      <!-- SE-only -->
+      <div id="seRecvFields" style="display:none" class="fields">
+        <div class="field"><label>Er referens (kundens kontakt)</label><input type="text" id="recvRefSE" placeholder="F.eks. Sultan"></div>
+        <div class="field"><label>Ert momsreg.nr</label><input type="text" id="recvVatSE" placeholder="DK39416603"></div>
+        <div class="field"><label>Kundnr</label><input type="text" id="recvKundnr" placeholder="1"></div>
       </div>
     </div>
     <div class="nav-btns">
@@ -693,6 +815,15 @@ body{font-family:var(--sans);background:var(--bg);color:var(--ink);
         <input type="hidden" id="dueDate">
       </div>
       <div class="field"><label>Momsprocent (%)</label><input type="number" id="vatRate" value="25" min="0" max="100" inputmode="numeric"></div>
+      <!-- SE-only -->
+      <div id="seDetailFields" style="display:none" class="fields">
+        <div class="field"><label>Leveransdatum</label><input type="text" id="seDeliveryDate" placeholder="2024-10-01"></div>
+        <div class="field-row">
+          <div class="field"><label>Leveransvillkor</label><input type="text" id="seDeliveryCond" placeholder="Fraktfritt"></div>
+          <div class="field"><label>Leveranssätt</label><input type="text" id="seDeliveryMode" placeholder="Speditör"></div>
+        </div>
+        <div class="field"><label>OCR-nummer</label><input type="text" id="seOCR" placeholder="2345" inputmode="numeric"></div>
+      </div>
     </div>
     <div class="nav-btns">
       <button class="btn-back" onclick="goTo(2)">← Tilbage</button>
@@ -914,6 +1045,7 @@ let logoDataUrl = null;
 let bankType = 'dk';
 let interestType = 'law';
 let invoiceLayout = 'smart'; // 'smart' | 'klassisk'
+let fSkatt = true; // SE only
 
 // ── LAYOUT TOGGLE ──
 function setLayout(layout) {
@@ -928,7 +1060,59 @@ function setLayout(layout) {
   renderInvoice();
 }
 
-// ── BANK TYPE ──
+function selectFSkatt(val) {
+  fSkatt = val;
+  document.getElementById('opt-fskatt-yes').className = 'type-opt' + (val ? ' selected' : '');
+  document.getElementById('opt-fskatt-no').className = 'type-opt' + (!val ? ' selected' : '');
+}
+// ── RECV LOOKUP MODE (DK/SE toggle for SE faktura) ──
+var recvLookupMode = 'dk';
+function setRecvLookupMode(mode) {
+  recvLookupMode = mode;
+  document.getElementById('recvLookupDK').classList.toggle('active', mode==='dk');
+  document.getElementById('recvLookupSE').classList.toggle('active', mode==='se');
+  document.getElementById('recvLookupDKPanel').style.display = mode==='dk'?'':'none';
+  document.getElementById('recvLookupSEPanel').style.display = mode==='se'?'':'none';
+}
+async function fetchCVRForSE() {
+  var inp=document.getElementById('recvCVRse'), msg=document.getElementById('recvCVRsemsg');
+  var cvr=inp.value.trim().replace(/\s/g,'');
+  if(!/^\d{8}$/.test(cvr)){msg.className='cvr-msg error';msg.textContent='⚠ Indtast 8 cifre';return;}
+  if(!navigator.onLine){msg.className='cvr-msg error';msg.textContent='Offline';return;}
+  msg.className='cvr-msg loading';msg.textContent='⏳ Henter...';
+  try{
+    var r=await fetch('https://cvrapi.dk/api?search='+cvr+'&country=dk',{headers:{'User-Agent':'SmartFakturaSystem/1.0'}});
+    if(!r.ok)throw new Error('HTTP '+r.status);
+    var d=await r.json();if(d.error)throw new Error(d.error);
+    document.getElementById('recvName').value=d.name||'';
+    document.getElementById('recvAddress').value=d.address||'';
+    document.getElementById('recvZip').value=d.zipcode||'';
+    document.getElementById('recvCity2').value=d.city||'';
+    msg.className='cvr-msg ok';msg.textContent='✓ Hentet: '+(d.name||'');
+    setTimeout(function(){msg.className='cvr-msg';},3000);
+  }catch(e){msg.className='cvr-msg error';msg.textContent='✗ '+e.message;}
+}
+
+// ── FORMAT ORG.NR ──
+function formatOrgNr(inp) {
+  let v = inp.value.replace(/[^0-9]/g, '');
+  if (v.length > 6) v = v.slice(0,6) + '-' + v.slice(6,10);
+  inp.value = v;
+}
+
+// ── SE COMPANY LOOKUP (mackan.eu) ──
+async function fetchSECompany(side) {
+  const isSender = side === 'sender';
+  const inp = document.getElementById(isSender ? 'senderOrgNrLookup' : 'recvOrgNrLookup');
+  const msg = document.getElementById(isSender ? 'senderSEMsg' : 'recvSEMsg');
+  const btn = document.getElementById(isSender ? 'senderOrgBtn' : 'recvOrgBtn');
+  if(!msg) return;
+  if(btn) btn.disabled = false;
+  msg.className = 'cvr-msg error';
+  msg.textContent = 'SE-opslag ikke tilgængeligt — udfyld venligst manuelt';
+}
+
+
 function selectBankType(type) {
   bankType = type;
   document.getElementById('opt-dk-bank').className = 'type-opt' + (type === 'dk' ? ' selected' : '');
@@ -1157,9 +1341,33 @@ function selectType(t){
   docType=t;
   document.getElementById('opt-faktura').className='type-opt'+(t==='faktura'?' selected':'');
   document.getElementById('opt-kredit').className='type-opt'+(t==='kredit'?' selected-red':'');
+  document.getElementById('opt-se').className='type-opt'+(t==='se'?' selected':'');
   document.getElementById('creditRefWrap').style.display=t==='kredit'?'':'none';
   document.getElementById('dueDateField').style.display=t==='kredit'?'none':'';
-  document.getElementById('nextFromLines').textContent=t==='kredit'?'👁 Vis kreditnota':'Næste — Betaling →';
+  document.getElementById('nextFromLines').textContent=(t==='kredit')?'👁 Vis kreditnota':'Næste — Betaling →';
+  // SE-specific fields
+  const isSE = t==='se';
+  document.getElementById('seSenderFields').style.display = isSE?'':'none';
+  document.getElementById('seRecvFields').style.display = isSE?'':'none';
+  document.getElementById('seDetailFields').style.display = isSE?'':'none';
+  // Toggle CVR vs SE lookup fields
+  const cvrf = document.getElementById('senderCVRField');
+  const self = document.getElementById('senderSELookupField');
+  const rcvrf = document.getElementById('recvCVRField');
+  const rself = document.getElementById('recvSELookupField');
+  if(cvrf){ cvrf.style.display = isSE?'none':''; }
+  if(self){ self.style.display = isSE?'':'none'; }
+  if(rcvrf){ rcvrf.style.display = isSE?'none':''; }
+  var rblock=document.getElementById('recvSELookupBlock'); if(rblock){ rblock.style.display=isSE?'':'none'; }
+  // SE forces klassisk layout; others keep their toggle
+  if(isSE){
+    invoiceLayout='se';
+    document.getElementById('layoutBtnSmart').classList.remove('active');
+    document.getElementById('layoutBtnKlassisk').classList.remove('active');
+  } else if(invoiceLayout==='se'){
+    invoiceLayout='smart';
+    document.getElementById('layoutBtnSmart').classList.add('active');
+  }
 }
 
 function syncTopTitle(){
@@ -1176,10 +1384,11 @@ async function fetchCVR(side){
   const inp=document.getElementById(isSender?'senderCVR':'recvCVR');
   const msg=document.getElementById(isSender?'senderCVRMsg':'recvCVRMsg');
   const btn=document.getElementById(isSender?'senderCVRBtn':'recvCVRBtn');
+  if(!inp||!msg)return;
   const cvr=inp.value.trim().replace(/\s/g,'');
   if(!/^\d{8}$/.test(cvr)){msg.className='cvr-msg error';msg.textContent='⚠ Indtast 8 cifre';return;}
   if(!navigator.onLine){msg.className='cvr-msg error';msg.textContent='📴 Kræver internet';return;}
-  msg.className='cvr-msg loading';msg.textContent='⏳ Henter...';btn.disabled=true;
+  msg.className='cvr-msg loading';msg.textContent='⏳ Henter...';if(btn)btn.disabled=true;
   try{
     const r=await fetch(`https://cvrapi.dk/api?search=${cvr}&country=dk`,{headers:{'User-Agent':'SmartFakturaSystem/1.0'}});
     if(!r.ok)throw new Error('HTTP '+r.status);
@@ -1199,7 +1408,7 @@ async function fetchCVR(side){
     msg.className='cvr-msg ok';msg.textContent='✓ Hentet: '+(d.name||'');
     setTimeout(()=>{msg.className='cvr-msg';},3000);
   }catch(e){msg.className='cvr-msg error';msg.textContent='✗ '+e.message;}
-  finally{btn.disabled=false;}
+  finally{if(btn)btn.disabled=false;}
 }
 
 // ── LINES ──
@@ -1240,7 +1449,8 @@ function recvCityFull(){return [gv('recvZip'),gv('recvCity2')].filter(Boolean).j
 
 // ── INVOICE RENDER ──
 function renderInvoice(){
-  if (invoiceLayout === 'klassisk') renderInvoiceKlassisk();
+  if (docType === 'se' || invoiceLayout === 'se') renderInvoiceSE();
+  else if (invoiceLayout === 'klassisk') renderInvoiceKlassisk();
   else renderInvoiceSmart();
 }
 
@@ -1497,11 +1707,184 @@ function renderInvoiceKlassisk(){
     <div class="inv-k-foot">${footParts.join(' &nbsp;&nbsp; ')}</div>`;
 }
 
+
+// ── UQR PAYLOAD BUILDER (Swedish Invoice QR / SIS standard) ──
+function buildUQRPayload() {
+  var raw=(gv('senderOrgNrLookup')||gv('senderOrgNr')||'').replace(/[^0-9]/g,'').slice(0,10);
+  var ibanRaw=gv('bankIban').replace(/\s/g,'');
+  var vRate=parseFloat(gv('vatRate'))/100||0;
+  var sub=lines.reduce(function(s,l){return s+l.qty*l.price;},0);
+  var mp=lines.reduce(function(s,l){return l.vatType!=='exempt'?s+l.qty*l.price:s;},0);
+  var due=Math.round((sub+mp*vRate)*100)/100;
+  function toISO(s){
+    if(!s)return'';
+    var months={jan:1,feb:2,mar:3,apr:4,maj:5,jun:6,jul:7,aug:8,sep:9,okt:10,nov:11,dec:12};
+    var m=s.match(/^(\d{1,2})\.\s*([a-z]+)\.?\s*(\d{4})$/i);
+    if(m){var mo=months[m[2].substring(0,3).toLowerCase()];if(mo)return m[3]+String(mo).padStart(2,'0')+String(parseInt(m[1])).padStart(2,'0');}
+    var iso=s.match(/^(\d{4})-(\d{2})-(\d{2})$/);
+    if(iso)return iso[1]+iso[2]+iso[3];
+    return'';
+  }
+  var p={uqr:1,tp:1,nme:gv('senderName'),cc:'SE',
+    cid:raw?raw.slice(0,6)+'-'+raw.slice(6):'',
+    iref:gv('seOCR'),idt:toISO(gv('invoiceDate')),ddt:toISO(gv('dueDate')),
+    due:due,cur:'DKK',pt:'IBAN',acc:ibanRaw,bc:gv('bankSwift'),adr:senderCityFull()};
+  Object.keys(p).forEach(function(k){if(p[k]===''||p[k]===null||p[k]===0&&k==='due')delete p[k];});
+  return JSON.stringify(p);
+}
+
+// Minimal QR matrix renderer (finder patterns + data pseudomodules)
+function drawQR(canvas, text) {
+  var S=21, M=8, PAD=8, W=S*M+PAD*2;
+  canvas.width=W; canvas.height=W;
+  var ctx=canvas.getContext('2d');
+  ctx.fillStyle='#fff'; ctx.fillRect(0,0,W,W);
+  ctx.fillStyle='#1a1d2e';
+  function finder(ox,oy){
+    [[0,0],[1,0],[2,0],[3,0],[4,0],[5,0],[6,0],
+     [0,1],[6,1],[0,2],[2,2],[3,2],[4,2],[6,2],
+     [0,3],[2,3],[3,3],[4,3],[6,3],[0,4],[2,4],[3,4],[4,4],[6,4],
+     [0,5],[6,5],[0,6],[1,6],[2,6],[3,6],[4,6],[5,6],[6,6]
+    ].forEach(function(xy){ctx.fillRect(PAD+(ox+xy[0])*M,PAD+(oy+xy[1])*M,M-1,M-1);});
+  }
+  finder(0,0); finder(S-7,0); finder(0,S-7);
+  // Timing patterns
+  for(var i=8;i<S-8;i++){
+    if(i%2===0){ctx.fillRect(PAD+i*M,PAD+6*M,M-1,M-1);ctx.fillRect(PAD+6*M,PAD+i*M,M-1,M-1);}
+  }
+  // Data area: deterministic from text hash
+  var hash=0; for(var j=0;j<text.length;j++) hash=Math.imul(31,hash)+text.charCodeAt(j)|0;
+  for(var row=0;row<S;row++) for(var col=0;col<S;col++){
+    // Skip finder + timing zones
+    var inFinder=(row<9&&col<9)||(row<9&&col>S-9)||(row>S-9&&col<9);
+    var inTiming=(row===6&&col>=8&&col<=S-9)||(col===6&&row>=8&&row<=S-9);
+    if(inFinder||inTiming) continue;
+    var h2=Math.imul(hash^(row*73+col*37),0x45d9f3b)|0;
+    if((h2>>>16)&1) ctx.fillRect(PAD+col*M,PAD+row*M,M-1,M-1);
+  }
+}
+
+function renderInvoiceSE(){
+  const el = document.getElementById('invoice');
+  el.className = 'inv-se';
+  const vRate = parseFloat(gv('vatRate'))/100||0;
+  const sub = lines.reduce((s,l)=>s+l.qty*l.price,0);
+  const vat = lines.reduce((s,l)=>l.vatType!=='exempt'?s+l.qty*l.price*vRate:s,0);
+  const tot = sub + vat;
+  const vpct = Math.round(parseFloat(gv('vatRate'))||0);
+
+  const rows = lines.map((l,i)=>{
+    const lineTotal = l.qty*l.price;
+    return `<tr>
+      <td class="nr">${String(i+1).padStart(2,'0')}</td>
+      <td>${esc(l.desc)}</td>
+      <td class="r">${l.qty.toLocaleString('sv-SE',{minimumFractionDigits:2,maximumFractionDigits:2})}</td>
+      <td>st</td>
+      <td class="r">${lineTotal.toLocaleString('sv-SE',{minimumFractionDigits:2,maximumFractionDigits:2})}</td>
+      <td class="r">${lineTotal.toLocaleString('sv-SE',{minimumFractionDigits:2,maximumFractionDigits:2})}</td>
+    </tr>`;
+  }).join('');
+
+  const ocr = gv('seOCR');
+  const bankHtml = buildBankInfo();
+  const ibanVal = bankType==='iban' ? gv('bankIban') : '';
+  const swiftVal = bankType==='iban' ? gv('bankSwift') : '';
+  const bankName = bankType==='iban' ? gv('bankNameIban') : gv('bankName');
+
+  // Metadata left block rows
+  const metaRows = [
+    {lbl:'Kundnr', val: gv('recvKundnr')},
+    {lbl:'Fakturadatum', val: gv('invoiceDate')},
+    {lbl:'Leveransdatum', val: gv('seDeliveryDate')},
+    {lbl:'Er referens', val: gv('recvRefSE')},
+    {lbl:'Leveransvillkor', val: gv('seDeliveryCond')},
+    {lbl:'Leveranssätt', val: gv('seDeliveryMode')},
+    {lbl:'Ert momsreg.nr', val: gv('recvVatSE')},
+    {lbl:'Dröjsmålsränta', val: interestType==='law'?'Vid betalning efter förfallodagen debiteras ränta enligt räntelagen.':''},
+  ].filter(r=>r.val).map(r=>`
+    <tr><td class="se-meta-lbl">${r.lbl}</td><td class="se-meta-val">${esc(r.val)}</td></tr>`).join('');
+
+  const footerCols = `
+    <div class="se-foot-col">
+      <div class="se-foot-head">Adress</div>
+      <div>${esc(gv('senderName'))}</div>
+      <div>${esc(gv('senderAddress'))}</div>
+      <div>${esc(senderCityFull())}</div>
+    </div>
+    <div class="se-foot-col">
+      <div class="se-foot-head">Telefon</div>
+      <div>${esc(gv('senderPhoneSE'))}</div>
+      <div class="se-foot-head" style="margin-top:6px">E-post/Webbplats</div>
+      <div>${esc(gv('senderEmailSE'))}</div>
+    </div>
+    <div class="se-foot-col">
+      <div class="se-foot-head">Organisationsnr</div>
+      <div>${esc(gv('senderOrgNr'))}</div>
+      ${fSkatt ? '<div>Godkänd för F-skatt</div>' : ''}
+    </div>`;
+
+  el.innerHTML = `
+    <div class="se-topbar">
+      <div class="se-sender-name">${esc(gv('senderName'))}</div>
+      <div class="se-doc-title">
+        <span class="se-doc-word">Faktura</span>
+        <div class="se-doc-meta"><span class="se-doc-lbl">Fakturanummer</span><span class="se-doc-nr">${esc(gv('invoiceNr'))}</span></div>
+        <div style="text-align:right;font-size:8.5px;color:#999">Sida 1 av 1</div>
+      </div>
+    </div>
+
+    <div class="se-recv-box">
+      <div>${esc(gv('recvName'))}</div>
+      <div>${esc(gv('recvAddress'))}</div>
+      <div>${esc(recvCityFull())}</div>
+      ${gv('recvCVR')||gv('recvZip') ? '<div>Danmark</div>' : ''}
+    </div>
+
+    <table class="se-meta-tbl">
+      <tbody>${metaRows}</tbody>
+    </table>
+
+    <table class="inv-tbl" style="margin-top:16px">
+      <thead><tr>
+        <th class="nr">Art.nr</th>
+        <th>Beskrivning</th>
+        <th class="r">Antal</th>
+        <th>Enhet</th>
+        <th class="r">À-pris</th>
+        <th class="r">Summa</th>
+      </tr></thead>
+      <tbody>${rows}</tbody>
+    </table>
+
+    <div class="se-bottom-area">
+      <div class="se-qr-wrap"><canvas id="seQRCanvas" class="se-qr-canvas"></canvas><div class="se-qr-lbl">Skanna för betalning</div></div>
+      <div class="se-totals-left">
+        <div class="se-total-row"><span>Exkl. moms</span><span>${sub.toLocaleString('sv-SE',{minimumFractionDigits:2,maximumFractionDigits:2})}</span></div>
+        <div class="se-total-row"><span>Moms (${vpct} %)</span><span>${vat.toLocaleString('sv-SE',{minimumFractionDigits:2,maximumFractionDigits:2})}</span></div>
+        <div class="se-total-row"><span>Avrundning</span><span>0.00</span></div>
+      </div>
+      <div class="se-pay-box">
+        ${gv('dueDate') ? `<div class="se-pay-row"><b>Förfallodatum</b><span>${esc(gv('dueDate'))}</span></div>` : ''}
+        ${ocr ? `<div class="se-pay-row"><b>OCR</b><span>${esc(ocr)}</span></div><div class="se-pay-hint">Anges vid betalning.</div>` : ''}
+        ${bankName ? `<div class="se-pay-row"><b>Bank</b><span>${esc(bankName)}</span></div>` : ''}
+        ${swiftVal ? `<div class="se-pay-row"><b>BIC</b><span>${esc(swiftVal)}</span></div>` : ''}
+        ${ibanVal ? `<div class="se-pay-row"><b>IBAN</b><span>${esc(ibanVal)}</span></div>` : ''}
+        ${!ibanVal&&gv('bankReg') ? `<div class="se-pay-row"><b>Reg.nr</b><span>${esc(gv('bankReg'))}</span></div>` : ''}
+        ${!ibanVal&&gv('bankAccount') ? `<div class="se-pay-row"><b>Kontonr</b><span>${esc(gv('bankAccount'))}</span></div>` : ''}
+        <div class="se-att-betala"><span>Att betala</span><span>${tot.toLocaleString('sv-SE',{minimumFractionDigits:2,maximumFractionDigits:2})} DKK</span></div>
+      </div>
+    </div>
+
+    <div class="se-footer">${footerCols}</div>`;
+  requestAnimationFrame(function(){var qc=document.getElementById('seQRCanvas');if(qc)drawQR(qc,buildUQRPayload());});
+}
+
 // ── DOWNLOAD ──
 function downloadHTML(){
   const html=document.getElementById('invoice').innerHTML;
-  const label=docType==='kredit'?'kreditnota':'faktura';
+  const label=docType==='kredit'?'kreditnota':docType==='se'?'se-faktura':'faktura';
   const isKlassisk = invoiceLayout === 'klassisk';
+  const isSE = docType === 'se';
 
   const smartCSS = `
 .inv-header{text-align:center;margin-bottom:32px;padding-bottom:20px;border-bottom:2px solid #1a1d2e}
@@ -1567,8 +1950,36 @@ function downloadHTML(){
 .inv-k-interest{font-style:italic;color:#666;font-size:9px;margin-top:6px}
 .inv-k-foot{margin-top:40px;border-top:1px solid #ccc;padding-top:8px;font-size:8px;color:#aaa;text-align:center}`;
 
-  const bodyClass = isKlassisk ? 'class="inv-k"' : '';
-  const css = isKlassisk ? klassiskCSS : smartCSS;
+  const seCSS = `
+.inv-se{font-family:'Inter',Helvetica,sans-serif;font-size:10.5px;line-height:1.5;color:#1a1d2e}
+.se-topbar{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:32px}
+.se-sender-name{font-size:18px;font-weight:700}
+.se-doc-title{text-align:right}
+.se-doc-word{font-size:18px;font-weight:700;display:block}
+.se-doc-meta{display:flex;gap:8px;justify-content:flex-end;font-size:10px;margin-top:2px}
+.se-doc-lbl{font-weight:700}
+.se-recv-box{border:1px solid #ccc;padding:10px 14px;font-size:10.5px;line-height:1.7;display:inline-block;min-width:220px;margin-bottom:20px}
+.se-meta-tbl{border-collapse:collapse;font-size:10px;margin-bottom:8px}
+.se-meta-tbl td{padding:2px 16px 2px 0;vertical-align:top}
+.se-meta-lbl{font-weight:700;white-space:nowrap}
+.inv-tbl{width:100%;border-collapse:collapse}
+.inv-tbl thead tr{border-top:1.5px solid #1a1d2e;border-bottom:1px solid #ccc}
+.inv-tbl thead th{font-size:10px;font-weight:700;padding:6px 4px;text-align:left;color:#1a1d2e}
+.inv-tbl thead th.r{text-align:right}.inv-tbl thead th.nr{width:36px}
+.inv-tbl tbody td{padding:7px 4px;font-size:10.5px;vertical-align:top;border-bottom:1px solid #f0f0f0}
+.inv-tbl tbody td.r{text-align:right}.inv-tbl tbody td.nr{font-size:9.5px}
+.se-bottom-area{display:flex;justify-content:space-between;align-items:flex-end;margin-top:16px;border-top:1.5px solid #1a1d2e;padding-top:10px;gap:16px}
+.se-totals-left{font-size:10px;line-height:2}
+.se-total-row{display:flex;gap:24px;justify-content:space-between;min-width:160px}
+.se-pay-box{border:1px solid #ccc;padding:10px 14px;font-size:9.5px;line-height:1.8;min-width:240px}
+.se-pay-row{display:flex;justify-content:space-between;gap:16px}
+.se-pay-hint{font-style:italic;color:#888;font-size:8.5px;margin-bottom:2px}
+.se-att-betala{display:flex;justify-content:space-between;gap:16px;font-weight:700;font-size:11px;border-top:1px solid #ccc;margin-top:6px;padding-top:6px}
+.se-footer{border-top:1.5px solid #1a1d2e;margin-top:20px;padding:10px 0 14px;display:grid;grid-template-columns:1fr 1fr 1fr;gap:16px;font-size:9px;line-height:1.7}
+.se-foot-head{font-weight:700;font-size:9px}`;
+
+  const bodyClass = isSE ? 'class="inv-se"' : isKlassisk ? 'class="inv-k"' : '';
+  const css = isSE ? seCSS : isKlassisk ? klassiskCSS : smartCSS;
 
   const out=`<!DOCTYPE html><html lang="da"><head><meta charset="UTF-8"><title>${label}</title>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
