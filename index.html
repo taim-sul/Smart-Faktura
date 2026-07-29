@@ -1705,12 +1705,11 @@ function renderInvoiceEconomic(){
     gv('invoiceNr'),
     gv('invoiceDate'),
     gv('recvCVR') || gv('senderCVR'),
-    '1 af 1',
-    '{ifdef-OevrigRef}'
+    '1 af 1'
   ].filter((v,i)=>i<2||v).map(v=>`<div class="inv-ec-meta-row"><span class="inv-ec-meta-colon">:</span><span class="inv-ec-meta-val">${esc(v)}</span></div>`).join('');
 
   // Payment section (blue text)
-  const bankDk = gv('bankReg') ? `Lunar - Regnr.: ${esc(gv('bankReg'))} / Kontonr.: ${esc(gv('bankAccount'))}` : gv('bankIban') ? `IBAN: ${esc(gv('bankIban'))}${gv('bankSwift')?' / BIC: '+esc(gv('bankSwift')):''}` : '';
+  const bankDk = gv('bankReg') ? ` - Regnr.: ${esc(gv('bankReg'))} / Kontonr.: ${esc(gv('bankAccount'))}` : gv('bankIban') ? `IBAN: ${esc(gv('bankIban'))}${gv('bankSwift')?' / BIC: '+esc(gv('bankSwift')):''}` : '';
   const payTermLabel = PAY_TERMS[selectedPayTerm]?.label || '';
   const dueStr = gv('dueDate');
   const invoiceRef = gv('invoiceNr') ? `Fakturanr. ${esc(gv('invoiceNr'))} bedes anført ved bankoverførsel` : '';
