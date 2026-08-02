@@ -963,6 +963,12 @@ body{font-family:var(--sans);background:var(--bg);color:var(--ink);
         <div class="field"><label>SWIFT / BIC</label><input type="text" id="bankSwift" placeholder="DEUTDEDB" style="text-transform:uppercase"></div>
       </div>
 
+      <!-- Reference felt -->
+      <div class="field">
+        <label>Reference <span style="font-weight:400;color:var(--muted)">(valgfri — vises med rød farve)</span></label>
+        <input type="text" id="invoiceReference" placeholder="F.eks. betalingsreference eller sagsnr.">
+      </div>
+
       <!-- Renter ved for sen betaling -->
       <div class="field">
         <label>Renter ved for sen betaling</label>
@@ -1116,7 +1122,7 @@ window.addEventListener('offline',()=>{const t=document.getElementById('toast');
 
 // ── STATE ──
 let docType='faktura', currentStep=0;
-let lines=[{desc:'',qty:1,price:0,vatType:'vat',note:''}];
+let lines=[{desc:'',qty:1,price:0,vatType:'vat',note:'',unit:'stk'}];
 let selectedPayTerm = 'immediate';
 let logoDataUrl = null;
 let bankType = 'dk';
@@ -1491,8 +1497,8 @@ async function fetchCVR(side){
 }
 
 // ── LINES ──
-function addLine(){lines.push({desc:'',qty:1,price:0,vatType:'vat',note:''});renderLines();}
-function removeLine(i){lines.splice(i,1);if(!lines.length)lines=[{desc:'',qty:1,price:0,vatType:'vat',note:''}];renderLines();}
+function addLine(){lines.push({desc:'',qty:1,price:0,vatType:'vat',note:'',unit:'stk'});renderLines();}
+function removeLine(i){lines.splice(i,1);if(!lines.length)lines=[{desc:'',qty:1,price:0,vatType:'vat',note:'',unit:'stk'}];renderLines();}
 function renderLines(){
   const c=document.getElementById('lineList');c.innerHTML='';
   lines.forEach((l,i)=>{
@@ -1507,6 +1513,15 @@ function renderLines(){
       <div class="field-row">
         <div class="field"><label>Antal</label>
           <input type="number" value="${l.qty}" min="0" step="any" inputmode="decimal" oninput="lines[${i}].qty=parseFloat(this.value)||0">
+        </div>
+        <div class="field"><label>Enhed</label>
+          <select oninput="lines[${i}].unit=this.value">
+            <option value="stk" ${(l.unit||'stk')==='stk'?'selected':''}>stk</option>
+            <option value="timer" ${(l.unit||'stk')==='timer'?'selected':''}>timer</option>
+            <option value="dage" ${(l.unit||'stk')==='dage'?'selected':''}>dage</option>
+            <option value="uge" ${(l.unit||'stk')==='uge'?'selected':''}>uge</option>
+            <option value="meter" ${(l.unit||'stk')==='meter'?'selected':''}>meter</option>
+          </select>
         </div>
         <div class="field"><label>Enhedspris (kr.)</label>
           <input type="number" value="${l.price}" min="0" step="0.01" inputmode="decimal" oninput="lines[${i}].price=parseFloat(this.value)||0">
@@ -1575,8 +1590,8 @@ function renderInvoiceSmart(){
     return `<tr class="irow">
       <td class="nr">${i+1}</td>
       <td>${esc(l.desc)}${l.note&&l.note.trim()?`<div class="inv-line-note">${esc(l.note)}</div>`:''}</td>
-      <td class="r">1</td>
       <td class="r">${esc(String(l.qty))}</td>
+      <td class="r">${esc(l.unit||'stk')}</td>
       <td class="${ac}">${lineMinus}${fmt(Math.abs(l.price))}</td>
       <td class="${ac}">${lineMinus}${fmt(Math.abs(lineTotal))}</td>
     </tr>`;
@@ -1600,6 +1615,7 @@ function renderInvoiceSmart(){
       <b>Betalingsbetingelser:</b> ${esc(PAY_TERMS[selectedPayTerm]?.label||'')}${gv('dueDate') ? ` — forfald <b>${esc(gv('dueDate'))}</b>` : ''}<br>
       ${bankHtml ? `<b>Bankoplysninger:</b> ${bankHtml}` : ''}${invoiceNrRef}
       ${gv('payNote') ? `<br>${esc(gv('payNote'))}` : ''}
+      ${gv('invoiceReference') ? `<br><span style="color:#e05252;font-weight:700">${esc(gv('invoiceReference'))}</span>` : ''}
       ${interestHtml}
     </div>` : '';
 
@@ -1629,6 +1645,7 @@ function renderInvoiceSmart(){
         <div class="inv-meta-row"><span class="inv-meta-lbl">Side</span><span class="inv-meta-val">1 af 1</span></div>
       </div>
     </div>
+    ${(()=>{const t=document.getElementById('invoiceNoteTitle');const b=document.getElementById('invoiceNoteBody');const title=t&&t.value.trim();const body=b&&b.value.trim();return (title||body)?`<div class="inv-note-block">${title?`<div class="inv-note-title">${esc(title)}</div>`:''}${body?`<div class="inv-note-body">${esc(body)}</div>`:''}</div>`:''})()}
     <table class="inv-tbl">
       <thead><tr>
         <th class="nr">Nr.</th>
@@ -1652,7 +1669,6 @@ function renderInvoiceSmart(){
       </div>
     </div>
     ${paySection}
-    ${(()=>{const t=document.getElementById('invoiceNoteTitle');const b=document.getElementById('invoiceNoteBody');const title=t&&t.value.trim();const body=b&&b.value.trim();return (title||body)?`<div class="inv-note-block">${title?`<div class="inv-note-title">${esc(title)}</div>`:''}${body?`<div class="inv-note-body">${esc(body)}</div>`:''}</div>`:''})()}
     <div class="inv-foot">${footParts.join(' &nbsp;·&nbsp; ')}</div>`;
 }
 
@@ -1684,7 +1700,7 @@ function renderInvoiceEconomic(){
       <td class="nr">${i+1}</td>
       <td>${esc(l.desc)}${noteHtml}</td>
       <td class="r">${l.qty}</td>
-      <td class="r">stk</td>
+      <td class="r">${esc(l.unit||'stk')}</td>
       <td class="${ac}">${lm}${fmt(Math.abs(l.price))}</td>
       <td class="${ac}">${lm}${fmt(Math.abs(lineTotal))}</td>
     </tr>`;
@@ -1705,20 +1721,28 @@ function renderInvoiceEconomic(){
     gv('invoiceNr'),
     gv('invoiceDate'),
     gv('recvCVR') || gv('senderCVR'),
-    '1 af 1'
+    '1 af 1',
+    gv('invoiceReference')
   ].filter((v,i)=>i<2||v).map(v=>`<div class="inv-ec-meta-row"><span class="inv-ec-meta-colon">:</span><span class="inv-ec-meta-val">${esc(v)}</span></div>`).join('');
 
   // Payment section (blue text)
-  const bankDk = gv('bankReg') ? ` - Regnr.: ${esc(gv('bankReg'))} / Kontonr.: ${esc(gv('bankAccount'))}` : gv('bankIban') ? `IBAN: ${esc(gv('bankIban'))}${gv('bankSwift')?' / BIC: '+esc(gv('bankSwift')):''}` : '';
+  const _bname = bankType==='iban' ? gv('bankNameIban') : gv('bankName');
+  const bankDk = bankType==='iban' && gv('bankIban')
+    ? `${_bname?esc(_bname)+' - ':''}IBAN: ${esc(gv('bankIban'))}${gv('bankSwift')?' / BIC: '+esc(gv('bankSwift')):''}`
+    : gv('bankReg')
+      ? `${_bname?esc(_bname)+' - ':''}Regnr.: ${esc(gv('bankReg'))} / Kontonr.: ${esc(gv('bankAccount'))}`
+      : '';
   const payTermLabel = PAY_TERMS[selectedPayTerm]?.label || '';
   const dueStr = gv('dueDate');
   const invoiceRef = gv('invoiceNr') ? `Fakturanr. ${esc(gv('invoiceNr'))} bedes anført ved bankoverførsel` : '';
   const interestLine = interestType==='law'
     ? `<div class="inv-ec-payment-interest">Ved for sen betaling påregnes rente i henhold til gældende lovgivning.</div>` : '';
+  const _refVal = gv('invoiceReference');
   const payHtml = !effectiveIsK ? `<div class="inv-ec-payment">
     <div>Betalingsbetingelser: ${esc(payTermLabel)}${dueStr?` - forfald <b>${esc(dueStr)}</b>`:''}</div>
     ${bankDk?`<div>Alternativt kan beløbet indbetales til vor bank. ${bankDk}</div>`:''}
     ${invoiceRef?`<div>${invoiceRef}</div>`:''}
+    ${_refVal?`<div style="color:#e05252;font-weight:700">${esc(_refVal)}</div>`:''}
     ${interestLine}
   </div>` : '';
 
@@ -1817,7 +1841,7 @@ function renderInvoiceKlassisk(){
       <td class="nr">${i+1}</td>
       <td>${esc(l.desc)}${l.note&&l.note.trim()?`<div class="inv-line-note">${esc(l.note)}</div>`:''}</td>
       <td class="r">${esc(String(l.qty))}</td>
-      <td class="r">Stk</td>
+      <td class="r">${esc(l.unit||'stk')}</td>
       <td class="${ac}">${lm}${fmt(Math.abs(l.price))}</td>
       <td class="${ac}">${lm}${fmt(Math.abs(lineTotal))}</td>
     </tr>`;
@@ -1853,6 +1877,7 @@ function renderInvoiceKlassisk(){
         <div><span style="color:#888">Betalingsmåde:</span> ${payMode}</div>
         ${ibanLine}${invoiceRef}
         ${gv('payNote') ? `<div>${esc(gv('payNote'))}</div>` : ''}
+        ${gv('invoiceReference') ? `<div style="color:#e05252;font-weight:700">${esc(gv('invoiceReference'))}</div>` : ''}
         ${interestLine}
       </div>`;
   }
@@ -1907,6 +1932,7 @@ function renderInvoiceKlassisk(){
 
     ${crLine}
 
+    ${(()=>{const t=document.getElementById('invoiceNoteTitle');const b=document.getElementById('invoiceNoteBody');const title=t&&t.value.trim();const body=b&&b.value.trim();return (title||body)?`<div class="inv-note-block" style="margin-bottom:12px">${title?`<div class="inv-note-title">${esc(title)}</div>`:''}${body?`<div class="inv-note-body">${esc(body)}</div>`:''}</div>`:''})()}
     <table class="inv-tbl">
       <thead><tr>
         <th class="nr">Varenr.</th>
@@ -1929,7 +1955,6 @@ function renderInvoiceKlassisk(){
 
     ${payRefHtml}
 
-    ${(()=>{const t=document.getElementById('invoiceNoteTitle');const b=document.getElementById('invoiceNoteBody');const title=t&&t.value.trim();const body=b&&b.value.trim();return (title||body)?`<div class="inv-note-block" style="border-top:1px solid #ccc;margin-top:16px;padding-top:12px">${title?`<div class="inv-note-title">${esc(title)}</div>`:''}${body?`<div class="inv-note-body">${esc(body)}</div>`:''}</div>`:''})()}
     <div class="inv-k-foot">${footParts.join(' &nbsp;&nbsp; ')}</div>`;
 }
 
@@ -2006,7 +2031,7 @@ function renderInvoiceSE(){
       <td class="nr">${String(i+1).padStart(2,'0')}</td>
       <td>${esc(l.desc)}${noteHtml}</td>
       <td class="r">${l.qty.toLocaleString('sv-SE',{minimumFractionDigits:2,maximumFractionDigits:2})}</td>
-      <td>st</td>
+      <td>${esc(l.unit||'st')}</td>
       <td class="r">${lineTotal.toLocaleString('sv-SE',{minimumFractionDigits:2,maximumFractionDigits:2})}</td>
       <td class="r">${lineTotal.toLocaleString('sv-SE',{minimumFractionDigits:2,maximumFractionDigits:2})}</td>
     </tr>`;
